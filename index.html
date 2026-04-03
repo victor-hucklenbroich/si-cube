@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silicon Cube — Miller Index Viewer</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <div id="side-panel">
+    <div id="panel-header">
+      <h1>Si Crystal Planes</h1>
+      <p class="subtitle">Miller Index Explorer</p>
+    </div>
+
+    <div id="current-face">
+      <div class="hud-label">FACING</div>
+      <div style="display:flex;align-items:baseline;gap:12px;">
+        <div id="facing-index" class="miller-big">(1 0 0)</div>
+        <div id="facing-family" class="family-tag family-100">{100}</div>
+      </div>
+    </div>
+
+    <div id="angle-table">
+      <div class="hud-label">ANGLES — CLICK TO NAVIGATE</div>
+      <div id="angle-list"></div>
+    </div>
+
+    <div id="legend">
+      <div class="legend-item"><span class="swatch-100"></span><span class="fam">{100}</span><span class="cnt">6</span></div>
+      <div class="legend-item"><span class="swatch-110"></span><span class="fam">{110}</span><span class="cnt">12</span></div>
+      <div class="legend-item"><span class="swatch-111"></span><span class="fam">{111}</span><span class="cnt">8</span></div>
+    </div>
+  </div>
+
+  <div id="controls-hint">
+    <span>LMB</span> Rotate &nbsp; <span>RMB</span> Pan &nbsp; <span>Scroll</span> Zoom
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
