@@ -17,16 +17,21 @@
   </script>
 </head>
 <body>
-  <div id="canvas-container"></div>
+  <div id="canvas-container">
+    <div id="toolbar">
+      <button id="btn-lang" onclick="switchLanguage()" title="Deutsch / English"></button>
+      <button id="btn-theme" onclick="switchTheme()" title="Light / Dark"></button>
+    </div>
+  </div>
 
   <div id="side-panel">
     <div id="panel-header">
-      <h1>Si Crystal Planes</h1>
-      <p class="subtitle">Miller Index Explorer</p>
+      <h1 data-i18n="title"></h1>
+      <p class="subtitle" data-i18n="subtitle"></p>
     </div>
 
     <div id="current-face">
-      <div class="hud-label">FACING</div>
+      <div class="hud-label" data-i18n="facing"></div>
       <div style="display:flex;align-items:baseline;gap:12px;">
         <div id="facing-index" class="miller-big">(1 0 0)</div>
         <div id="facing-family" class="family-tag family-100">{100}</div>
@@ -34,21 +39,36 @@
     </div>
 
     <div id="angle-table">
-      <div class="hud-label">ANGLES — CLICK TO NAVIGATE</div>
+      <div class="hud-label" data-i18n="angles"></div>
       <div id="angle-list"></div>
     </div>
 
-    <div id="legend">
-      <div class="legend-item"><span class="swatch-100"></span><span class="fam">{100}</span><span class="cnt">6</span></div>
-      <div class="legend-item"><span class="swatch-110"></span><span class="fam">{110}</span><span class="cnt">12</span></div>
-      <div class="legend-item"><span class="swatch-111"></span><span class="fam">{111}</span><span class="cnt">8</span></div>
+    <div id="panel-footer">
+      <div id="legend">
+        <div class="legend-item"><span class="swatch-100"></span><span class="fam">{100}</span></div>
+        <div class="legend-item"><span class="swatch-110"></span><span class="fam">{110}</span></div>
+        <div class="legend-item"><span class="swatch-111"></span><span class="fam">{111}</span></div>
+      </div>
+      <button id="reset-btn" onclick="resetCamera()" data-i18n="center"></button>
     </div>
   </div>
 
   <div id="controls-hint">
-    <span>LMB</span> Rotate &nbsp; <span>RMB</span> Pan &nbsp; <span>Scroll</span> Zoom
+    <span>◧</span>
+    <span data-i18n="rotate"></span>
+    &nbsp;
+    <span>◨</span>
+    <span data-i18n="pan"></span>
+    &nbsp;
+    <span>◎</span>
+    <span data-i18n="zoom"></span>
   </div>
 
   <script type="module" src="js/app.js"></script>
+
+  <div id="version-text">
+    <span>v1.0.0</span>
+  </div>
+
 </body>
 </html>
