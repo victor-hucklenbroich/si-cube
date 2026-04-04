@@ -32,23 +32,19 @@ const translations = {
 
 const THEME_COLORS = {
     dark: {
-        sceneBg: 0x262626,
-        edgeColor: 0x3a3f4a,
-        faceBgBase: 60,
+        sceneBg: 0x212121,
+        faceColor: "dimgrey",
+        textColor: "snow",
+        edgeColor: 0xB3B3B3,
         faceTextAlpha: 1.0,
     },
     light: {
-        sceneBg: 0xd4d4d4,
-        edgeColor: 0x9ca3af,
-        faceBgBase: 210,
+        sceneBg: 0xF2F2F2,
+        faceColor: "white",
+        textColor: "black",
+        edgeColor: 0x595959,
         faceTextAlpha: 0.85,
-    },
-};
-
-const FAMILY_COLORS = {
-    '100': {r: 94, g: 234, b: 212},
-    '110': {r: 245, g: 158, b: 11},
-    '111': {r: 167, g: 139, b: 250},
+    }
 };
 
 const DEFAULT_CAM = {x: 3.8, y: 2.5, z: 3.8};
@@ -90,18 +86,12 @@ async function init() {
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.rotateSpeed = 0.6;
-    controls.minDistance = 2;
-    controls.maxDistance = 10;
+    controls.minDistance = 6;
+    controls.maxDistance = 25;
     controls.target.set(0, 0, 0);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const d1 = new THREE.DirectionalLight(0xffffff, 0.6);
-    d1.position.set(3, 5, 4);
-    scene.add(d1);
-    const d2 = new THREE.DirectionalLight(0x8888ff, 0.2);
-    d2.position.set(-3, -2, -4);
-    scene.add(d2);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
     // Build
     buildCube(cubeData);
@@ -109,10 +99,7 @@ async function init() {
     // Events
     window.addEventListener('resize', onResize);
     renderer.domElement.addEventListener('pointerdown', () => {
-        if (animTarget) {
-            animTarget = null;
-            controls.enableDamping = true;
-        }
+        if (animTarget) { animTarget = null; controls.enableDamping = true; }
     });
 
     animate();
@@ -178,21 +165,18 @@ function createFaceTexture(label, family, isTriangle) {
     canvas.height = size;
     const ctx = canvas.getContext('2d');
 
-    const fc = FAMILY_COLORS[family];
     const tc = THEME_COLORS[settings.theme];
-    const base = tc.faceBgBase;
 
-    // Background tinted with family color
-    ctx.fillStyle = `rgb(${Math.round(fc.r * 0.15 + base)}, ${Math.round(fc.g * 0.15 + base)}, ${Math.round(fc.b * 0.15 + base)})`;
+    ctx.fillStyle = tc["faceColor"];
     ctx.fillRect(0, 0, size, size);
 
     // Text
-    const fontSize = isTriangle ? 38 : 44;
+    const fontSize = isTriangle ? 38 : 48;
     ctx.font = `300 ${fontSize}px 'Helvetica Neue', 'Arial', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.globalAlpha = tc.faceTextAlpha;
-    ctx.fillStyle = `rgb(${fc.r}, ${fc.g}, ${fc.b})`;
+    ctx.fillStyle = tc["textColor"];
 
     const cx = size / 2, cy = size / 2;
     const parts = label.map((v) => ({val: Math.abs(v), neg: v < 0}));
@@ -208,11 +192,11 @@ function createFaceTexture(label, family, isTriangle) {
         ctx.fillText(String(p.val), x, cy);
         if (p.neg) {
             const w = ctx.measureText(String(p.val)).width / 2;
-            ctx.strokeStyle = `rgb(${fc.r}, ${fc.g}, ${fc.b})`;
-            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = tc["textColor"]; // negation line
+            ctx.lineWidth = 2.8;
             ctx.beginPath();
-            ctx.moveTo(x - w, cy - fontSize * 0.42);
-            ctx.lineTo(x + w, cy - fontSize * 0.42);
+            ctx.moveTo(x - w, cy - fontSize * 0.52);
+            ctx.lineTo(x + w, cy - fontSize * 0.52);
             ctx.stroke();
         }
     });
@@ -307,8 +291,7 @@ function buildCube(cube) {
         const texture = createFaceTexture(face.label, face.family, isTriangle);
         const mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({
             map: texture,
-            shininess: 40,
-            specular: 0x222222,
+            flatShading: true,
             side: THREE.DoubleSide,
         }));
         scene.add(mesh);
