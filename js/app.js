@@ -2,12 +2,41 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
+const settings = {
+  theme: getPreferredTheme(),
+  lang: localStorage.getItem("lang") || "en"
+};
+
+const translations = {
+  de: {
+    title: "Si Kristallebenen",
+    subtitle: "Millersche Indizes",
+    facing: "BETRACHTETE EBENE",
+    angles: "WINKEL",
+    rotate: "Drehen",
+    pan: "Bewegen",
+    zoom: "Zoom"
+  },
+  en: {
+    title: "Si Crystal Planes",
+    subtitle: "Miller Indices",
+    facing: "FACING PLANE",
+    angles: "ANGLES",
+    rotate: "Rotate",
+    pan: "Pan",
+    zoom: "Zoom"
+  }
+};
+
 let scene, camera, renderer, controls;
 let facesData = [];
 let currentFaceIdx = -1;
 let animTarget = null;
 
 async function init() {
+  setLanguage(settings["lang"]);
+  setTheme(settings["theme"]);
+
   const resp = await fetch('data/cube.json');
   const cube = await resp.json();
 
@@ -58,6 +87,36 @@ async function init() {
   });
 
   animate();
+}
+
+function getPreferredTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved) return saved;
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+}
+
+function setTheme(theme) {
+  localStorage.setItem("theme", theme);
+}
+
+function getPreferredLanguage() {
+  const browserLang = navigator.language.startsWith("de") ? "de" : "en";
+  const savedLang = localStorage.getItem("lang") || browserLang;
+  return savedLang;
+}
+
+function setLanguage(lang) {
+  const elements = document.querySelectorAll("[data-i18n]");
+
+  elements.forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = translations[lang][key];
+  });
+
+  localStorage.setItem("lang", lang);
 }
 
 function buildCube(cube) {
