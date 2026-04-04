@@ -1,6 +1,6 @@
 # Silicon Cube — Miller Index Viewer
 
-**Version:** v1.0.0-SNAPSHOT
+**Version:** v1.0.0
 
 **Author:** Victor Hucklenbroich
 
