@@ -2,8 +2,10 @@
 
 **Version:** v1.0.0
 
-A compact web app to accompany the TUM lecture MW0080 Microsensor / Actuators. 
-Intended to make the lectures Silicon cube more accessible. Note that this is an independent student project and not officially affiliated with TUM.
+Compact web app to accompany the TUM lecture MW0080 Microsensor & Actuators. 
+Intended to make the lectures Silicon cube more accessible. 
+
+__Note_ that this is an independent student project and not officially affiliated with TUM._
 
 App available at: https://victor-hucklenbroich.github.io/si-cube/
 
