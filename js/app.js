@@ -9,6 +9,7 @@ const settings = {
 
 const translations = {
     de: {
+        page: "Silizium Würfel",
         title: "Si Kristallebenen",
         subtitle: "Millersche Indizes",
         facing: "BETRACHTETE EBENE",
@@ -19,6 +20,7 @@ const translations = {
         center: "⌂ Zentrieren",
     },
     en: {
+        page: "Silicon Cube",
         title: "Si Crystal Planes",
         subtitle: "Miller Indices",
         facing: "FACING PLANE",
