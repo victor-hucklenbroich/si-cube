@@ -19,7 +19,6 @@ const translations = {
         select: "Auswählen",
         family: "Äquivalente",
         zoom: "Zoom",
-        center: "⌂ Zentrieren",
         hint_empty: "Rechtsklick auf eine Ebene (•••) um diese auszuwählen. Shift+Rechtsklick wählt alle äquialenten Ebenen {•••} aus.",
         hint_single: "Wähle eine weitere Ebene, um dessen Winkel zu vergleichen.",
     },
@@ -34,7 +33,6 @@ const translations = {
         select: "Select",
         family: "Equivalents",
         zoom: "Zoom",
-        center: "⌂ Center",
         hint_empty: "Right-click a plane (•••) to select. Shift+right-click selects all equivalent planes {•••}.",
         hint_single: "Select another plane to compare their angles.",
     },
@@ -463,17 +461,6 @@ window.navigateToFace = function (faceIdx) {
     const radius = camera.position.length();
     animTarget = {
         position: face.normal.clone().multiplyScalar(radius),
-        startPos: camera.position.clone(),
-        startTarget: controls.target.clone(),
-        endTarget: new THREE.Vector3(0, 0, 0),
-        progress: 0,
-    };
-    controls.enableDamping = false;
-};
-
-window.resetCamera = function () {
-    animTarget = {
-        position: new THREE.Vector3(DEFAULT_CAM.x, DEFAULT_CAM.y, DEFAULT_CAM.z),
         startPos: camera.position.clone(),
         startTarget: controls.target.clone(),
         endTarget: new THREE.Vector3(0, 0, 0),
