@@ -15,9 +15,13 @@ const translations = {
         facing: "BETRACHTETE EBENE",
         angles: "WINKEL",
         rotate: "Drehen",
-        pan: "Bewegen",
+        reference: "Referenzebene",
+        select: "Auswählen",
+        family: "Äquivalente",
         zoom: "Zoom",
         center: "⌂ Zentrieren",
+        hint_empty: "Rechtsklick auf eine Ebene (•••) um diese auszuwählen. Shift+Rechtsklick wählt alle äquialenten Ebenen {•••} aus.",
+        hint_single: "Wähle eine weitere Ebene, um dessen Winkel zu vergleichen.",
     },
     en: {
         page: "Silicon Cube",
@@ -26,9 +30,13 @@ const translations = {
         facing: "FACING PLANE",
         angles: "ANGLES",
         rotate: "Rotate",
-        pan: "Pan",
+        reference: "Reference Plane",
+        select: "Select",
+        family: "Equivalents",
         zoom: "Zoom",
         center: "⌂ Center",
+        hint_empty: "Right-click a plane (•••) to select. Shift+right-click selects all equivalent planes {•••}.",
+        hint_single: "Select another plane to compare their angles.",
     },
 };
 
@@ -49,15 +57,27 @@ const THEME_COLORS = {
     }
 };
 
+const PLANE_COLORS = {
+    dark:  { '100': '#41ccb4', '110': '#f59e0b', '111': '#a78bfa' },
+    light: { '100': '#19cc9c', '110': '#f5490b', '111': '#761aff' },
+};
+
 const DEFAULT_CAM = {x: 3.8, y: 2.5, z: 3.8};
 
 let scene, camera, renderer, controls;
 let facesData = [];
-let currentFaceIdx = -1;
+let currentRefIdx = -1;
+let currentRefMode = null;
 let animTarget = null;
 let faceMeshes = [];
 let edgeLines = null;
 let cubeData = null;
+
+// Selection state
+const selectedFaces = new Set();
+const raycaster = new THREE.Raycaster();
+const mouseNDC = new THREE.Vector2();
+let rmbDownPos = null;
 
 
 async function init() {
@@ -91,17 +111,28 @@ async function init() {
     controls.minDistance = 6;
     controls.maxDistance = 25;
     controls.target.set(0, 0, 0);
+    controls.enablePan = false;
+    controls.mouseButtons = {
+        LEFT: THREE.MOUSE.ROTATE,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: null,
+    };
 
     // Lighting
     scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
     // Build
     buildCube(cubeData);
+    updateReferenceFace();
+    updateAngleList();
 
     // Events
     window.addEventListener('resize', onResize);
-    renderer.domElement.addEventListener('pointerdown', () => {
-        if (animTarget) { animTarget = null; controls.enableDamping = true; }
+    renderer.domElement.addEventListener('pointerdown', onPointerDown);
+    renderer.domElement.addEventListener('pointerup', onPointerUp);
+    renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && selectedFaces.size > 0) clearSelection();
     });
 
     animate();
@@ -151,8 +182,13 @@ function applyLanguage(lang) {
     const btn = document.getElementById('btn-lang');
     if (btn) btn.textContent = lang === 'de' ? 'DE' : 'EN';
 
-    // Force HUD re-render
-    currentFaceIdx = -1;
+    // Force HUD re-render so reference-mode label gets correct translation
+    currentRefIdx = -1;
+    currentRefMode = null;
+    if (facesData.length) {
+        updateReferenceFace();
+        updateAngleList();
+    }
 }
 
 window.switchLanguage = function () {
@@ -160,7 +196,7 @@ window.switchLanguage = function () {
 };
 
 // Miller index labels
-function createFaceTexture(label, family, isTriangle) {
+function createFaceTexture(label, family, isTriangle, isSelected) {
     const size = 256;
     const canvas = document.createElement('canvas');
     canvas.width = size;
@@ -169,7 +205,7 @@ function createFaceTexture(label, family, isTriangle) {
 
     const tc = THEME_COLORS[settings.theme];
 
-    ctx.fillStyle = tc["faceColor"];
+    ctx.fillStyle = isSelected ? PLANE_COLORS[settings.theme][family] : tc.faceColor;
     ctx.fillRect(0, 0, size, size);
 
     // Text
@@ -177,8 +213,10 @@ function createFaceTexture(label, family, isTriangle) {
     ctx.font = `300 ${fontSize}px 'Helvetica Neue', 'Arial', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.globalAlpha = tc.faceTextAlpha;
-    ctx.fillStyle = tc["textColor"];
+
+    const textColor = isSelected ? '#ffffff' : tc.textColor;
+    ctx.globalAlpha = isSelected ? 1.0 : tc.faceTextAlpha;
+    ctx.fillStyle = textColor;
 
     const cx = size / 2, cy = size / 2;
     const parts = label.map((v) => ({val: Math.abs(v), neg: v < 0}));
@@ -194,8 +232,8 @@ function createFaceTexture(label, family, isTriangle) {
         ctx.fillText(String(p.val), x, cy);
         if (p.neg) {
             const w = ctx.measureText(String(p.val)).width / 2;
-            ctx.strokeStyle = tc["textColor"]; // negation line
-            ctx.lineWidth = 2.8;
+            ctx.strokeStyle = textColor;
+            ctx.lineWidth = 2.65;
             ctx.beginPath();
             ctx.moveTo(x - w, cy - fontSize * 0.52);
             ctx.lineTo(x + w, cy - fontSize * 0.52);
@@ -211,10 +249,11 @@ function createFaceTexture(label, family, isTriangle) {
 }
 
 function rebuildFaceTextures() {
-    faceMeshes.forEach(({mesh, label, family, isTriangle}) => {
-        if (mesh.material.map) mesh.material.map.dispose();
-        mesh.material.map = createFaceTexture(label, family, isTriangle);
-        mesh.material.needsUpdate = true;
+    faceMeshes.forEach((fm, idx) => {
+        const isSelected = selectedFaces.has(idx);
+        if (fm.mesh.material.map) fm.mesh.material.map.dispose();
+        fm.mesh.material.map = createFaceTexture(fm.label, fm.family, fm.isTriangle, isSelected);
+        fm.mesh.material.needsUpdate = true;
     });
 }
 
@@ -290,7 +329,7 @@ function buildCube(cube) {
         geom.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
         geom.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
 
-        const texture = createFaceTexture(face.label, face.family, isTriangle);
+        const texture = createFaceTexture(face.label, face.family, isTriangle, false);
         const mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({
             map: texture,
             flatShading: true,
@@ -351,6 +390,74 @@ function angleBetween(n1, n2) {
     return THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(n1.dot(n2), -1, 1)));
 }
 
+// Selection
+function onPointerDown(e) {
+    if (animTarget) { animTarget = null; controls.enableDamping = true; }
+    if (e.button === 2) rmbDownPos = { x: e.clientX, y: e.clientY };
+}
+
+function onPointerUp(e) {
+    if (e.button !== 2 || !rmbDownPos) return;
+    const dx = e.clientX - rmbDownPos.x;
+    const dy = e.clientY - rmbDownPos.y;
+    rmbDownPos = null;
+    if (dx * dx + dy * dy > 25) return;
+    handleSelectClick(e);
+}
+
+function handleSelectClick(e) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouseNDC, camera);
+    const meshes = faceMeshes.map(f => f.mesh);
+    const hits = raycaster.intersectObjects(meshes, false);
+
+    if (hits.length === 0) {
+        if (selectedFaces.size > 0) clearSelection();
+        return;
+    }
+
+    const idx = faceMeshes.findIndex(f => f.mesh === hits[0].object);
+    if (idx < 0) return;
+
+    if (e.shiftKey) toggleFamily(idx);
+    else toggleFace(idx);
+
+    rebuildFaceTextures();
+    updateReferenceFace();
+    updateAngleList();
+}
+
+function toggleFace(idx) {
+    if (selectedFaces.has(idx)) selectedFaces.delete(idx);
+    else selectedFaces.add(idx);
+}
+
+function toggleFamily(clickedIdx) {
+    const family = facesData[clickedIdx].family;
+    const ids = facesData
+        .map((f, i) => f.family === family ? i : -1)
+        .filter(i => i >= 0);
+    const allOn = ids.every(i => selectedFaces.has(i));
+    if (allOn) {
+        ids.forEach(i => selectedFaces.delete(i));
+    } else {
+        selectedFaces.add(clickedIdx);
+        ids.forEach(i => selectedFaces.add(i));
+    }
+}
+
+function clearSelection() {
+    selectedFaces.clear();
+    rebuildFaceTextures();
+    updateReferenceFace();
+    updateAngleList();
+}
+
+window.clearSelection = clearSelection;
+
 window.navigateToFace = function (faceIdx) {
     const face = facesData[faceIdx];
     const radius = camera.position.length();
@@ -375,38 +482,66 @@ window.resetCamera = function () {
     controls.enableDamping = false;
 };
 
-function updateHUD() {
-    const faceIdx = findFacingPlane();
-    if (faceIdx === currentFaceIdx) return;
-    currentFaceIdx = faceIdx;
+function updateReferenceFace() {
+    let mode, idx;
+    if (selectedFaces.size > 0) {
+        mode = 'selected';
+        idx = selectedFaces.values().next().value;
+    } else {
+        mode = 'facing';
+        idx = findFacingPlane();
+    }
 
-    const face = facesData[faceIdx];
+    if (idx === currentRefIdx && mode === currentRefMode) return;
+    currentRefIdx = idx;
+    currentRefMode = mode;
+
+    const face = facesData[idx];
     document.getElementById('facing-index').innerHTML = formatMillerIndexHTML(face.label);
     const familyEl = document.getElementById('facing-family');
     familyEl.textContent = '{' + face.family + '}';
     familyEl.className = 'family-tag family-' + face.family;
+    document.getElementById('face-label').textContent =
+        translations[settings.lang][mode === 'selected' ? 'reference' : 'facing'];
+}
 
-    const seen = new Set();
-    const entries = [];
-    facesData.forEach((other, i) => {
-        if (i === faceIdx) return;
-        const key = other.label.join(',');
-        if (seen.has(key)) return;
-        seen.add(key);
-        entries.push({
-            label: other.label, family: other.family,
-            angle: angleBetween(face.normal, other.normal), idx: i,
-        });
-    });
-    entries.sort((a, b) => a.angle - b.angle);
+function updateAngleList() {
+    const listEl = document.getElementById('angle-list');
+    const clearBtn = document.getElementById('clear-btn');
+    const t = translations[settings.lang];
 
-    document.getElementById('angle-list').innerHTML = entries.map((e) => `
-    <div class="angle-row" onclick="navigateToFace(${e.idx})">
-      <span class="dot dot-${e.family}"></span>
-      <span class="idx">${formatMillerIndexHTML(e.label)}</span>
-      <span class="deg">${e.angle.toFixed(1)}°</span>
-    </div>
-  `).join('');
+    const selected = Array.from(selectedFaces);
+
+    if (clearBtn) clearBtn.style.visibility = selected.length > 0 ? 'visible' : 'hidden';
+
+    if (selected.length === 0) {
+        listEl.innerHTML = `<div class="hint-msg">${t.hint_empty}</div>`;
+        return;
+    }
+
+    if (selected.length === 1) {
+        listEl.innerHTML = `<div class="hint-msg">${t.hint_single}</div>`;
+        return;
+    }
+
+    // Angles from the reference plane (first selected)
+    const refIdx = selected[0];
+    const ref = facesData[refIdx];
+
+    const others = selected.slice(1).map(i => ({
+        idx: i,
+        face: facesData[i],
+        angle: angleBetween(ref.normal, facesData[i].normal),
+    }));
+    others.sort((a, b) => a.angle - b.angle);
+
+    listEl.innerHTML = others.map(o => `
+        <div class="angle-row" onclick="navigateToFace(${o.idx})">
+            <span class="dot dot-${o.face.family}"></span>
+            <span class="idx">${formatMillerIndexHTML(o.face.label)}</span>
+            <span class="deg">${o.angle.toFixed(1)}°</span>
+        </div>
+    `).join('');
 }
 
 function onResize() {
@@ -435,7 +570,7 @@ function animate() {
         controls.update();
     }
 
-    updateHUD();
+    updateReferenceFace();
     renderer.render(scene, camera);
 }
 

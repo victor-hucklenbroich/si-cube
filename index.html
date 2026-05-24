@@ -31,7 +31,7 @@
     </div>
 
     <div id="current-face">
-      <div class="hud-label" data-i18n="facing"></div>
+      <div class="hud-label" id="face-label" data-i18n="facing"></div>
       <div style="display:flex;align-items:baseline;gap:12px;">
         <div id="facing-index" class="miller-big">(1 0 0)</div>
         <div id="facing-family" class="family-tag family-100">{100}</div>
@@ -39,7 +39,10 @@
     </div>
 
     <div id="angle-table">
-      <div class="hud-label" data-i18n="angles"></div>
+      <div class="angle-header">
+        <span class="hud-label" data-i18n="angles"></span>
+        <button id="clear-btn" onclick="clearSelection()" title="Clear (Esc)" aria-label="Clear selection">×</button>
+      </div>
       <div id="angle-list"></div>
     </div>
 
@@ -54,14 +57,13 @@
   </div>
 
   <div id="controls-hint">
-    <span>◧</span>
-    <span data-i18n="rotate"></span>
-    &nbsp;
-    <span>◨</span>
-    <span data-i18n="pan"></span>
-    &nbsp;
-    <span>◎</span>
-    <span data-i18n="zoom"></span>
+    <span class="ctrl-icon">◧</span><span data-i18n="rotate"></span>
+    <span class="sep">·</span>
+    <span class="ctrl-icon">◨</span><span data-i18n="select"></span>
+    <span class="sep">·</span>
+    <span class="ctrl-icon">⇧◨</span><span data-i18n="family"></span>
+    <span class="sep">·</span>
+    <span class="ctrl-icon">◎</span><span data-i18n="zoom"></span>
   </div>
 
   <script type="module" src="js/app.js"></script>
