@@ -1,73 +1,15 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
+import {THEME_COLORS, PLANE_COLORS, REFERENCE_COLORS, DEFAULT_CAM} from './config.js';
+import {translations, getPreferredLanguage, applyTranslations} from './i18n.js';
+import {renderFormula, setupFormulaPopover} from './formula.js';
+
 
 const settings = {
     theme: getPreferredTheme(),
     lang: getPreferredLanguage(),
 };
-
-const translations = {
-    de: {
-        page: "Silizium Würfel",
-        title: "Si Kristallebenen",
-        subtitle: "Millersche Indizes",
-        facing: "BETRACHTETE EBENE",
-        angles: "WINKEL",
-        rotate: "Drehen",
-        reference: "Referenzebene",
-        select: "Auswählen",
-        zoom: "Zoom",
-        hint_empty: "Rechtsklick auf eine Ebene (•••) um diese auszuwählen. Shift+Rechtsklick wählt alle äquialenten Ebenen {•••} aus.",
-        hint_single: "Wähle eine weitere Ebene, um dessen Winkel zu vergleichen.",
-        formula_plane1: "Indizes Ebene 1",
-        formula_plane2: "Indizes Ebene 2",
-    },
-    en: {
-        page: "Silicon Cube",
-        title: "Si Crystal Planes",
-        subtitle: "Miller Indices",
-        facing: "FACING PLANE",
-        angles: "ANGLES",
-        rotate: "Rotate",
-        reference: "Reference Plane",
-        select: "Select",
-        zoom: "Zoom",
-        hint_empty: "Right-click a plane (•••) to select. Shift+right-click selects all equivalent planes {•••}.",
-        hint_single: "Select another plane to compare their angles.",
-        formula_plane1: "indices of plane 1",
-        formula_plane2: "indices of plane 2",
-    },
-};
-
-const THEME_COLORS = {
-    dark: {
-        sceneBg: 0x1b1e24,
-        faceColor: "#565b66",
-        textColor: "#f1f5f9",
-        edgeColor: 0xcbd5e1,
-        faceTextAlpha: 1.0,
-    },
-    light: {
-        sceneBg: 0xe2e8f0,
-        faceColor: "#ffffff",
-        textColor: "#1f2937",
-        edgeColor: 0x475569,
-        faceTextAlpha: 0.9,
-    }
-};
-
-const PLANE_COLORS = {
-    dark:  { '100': '#14b8a6', '110': '#f97316', '111': '#8b5cf6' },
-    light: { '100': '#0d9488', '110': '#ea580c', '111': '#7c3aed' },
-};
-
-const REFERENCE_COLORS = {
-    dark: '#f43f5e',
-    light: '#e11d48',
-};
-
-const DEFAULT_CAM = {x: 3.8, y: 2.5, z: 3.8};
 
 let scene, camera, renderer, controls;
 let facesData = [];
@@ -172,23 +114,9 @@ window.switchTheme = function () {
     applyTheme(settings.theme === 'dark' ? 'light' : 'dark');
 };
 
-function getPreferredLanguage() {
-    const saved = localStorage.getItem('lang');
-    if (saved) return saved;
-    return navigator.language.startsWith('de') ? 'de' : 'en';
-}
-
 function applyLanguage(lang) {
     settings.lang = lang;
-    localStorage.setItem('lang', lang);
-
-    document.querySelectorAll('[data-i18n]').forEach((el) => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) el.textContent = translations[lang][key];
-    });
-
-    const btn = document.getElementById('btn-lang');
-    if (btn) btn.textContent = lang === 'de' ? 'DE' : 'EN';
+    applyTranslations(lang);
 
     // Force HUD re-render so reference-mode label gets correct translation
     currentRefIdx = -1;
@@ -202,73 +130,6 @@ function applyLanguage(lang) {
 window.switchLanguage = function () {
     applyLanguage(settings.lang === 'de' ? 'en' : 'de');
 };
-
-const FORMULA_FRAC = String.raw`\dfrac{h\,h'+k\,k'+l\,l'}{\sqrt{(h^2+k^2+l^2)\,(h'^2+k'^2+l'^2)}}`;
-const FORMULA_LATEX = String.raw`\begin{aligned}
-\cos(\alpha) &= ${FORMULA_FRAC} \\[6pt]
-\Rightarrow\quad \alpha &= \cos^{-1}\!\left(${FORMULA_FRAC}\right)
-\end{aligned}`;
-
-function renderFormula() {
-    const el = document.getElementById('formula');
-    if (!el || !window.katex) return;
-    katex.render(FORMULA_LATEX, el, {throwOnError: false, displayMode: true});
-    fitFormula();
-}
-
-function fitFormula() {
-    const el = document.getElementById('formula');
-    if (!el) return;
-    el.style.fontSize = '';
-    const k = el.querySelector('.katex-display') || el.firstElementChild;
-    if (!k) return;
-    const avail = el.clientWidth;
-    if (avail > 0 && k.scrollWidth > avail) {
-        const base = parseFloat(getComputedStyle(el).fontSize);
-        el.style.fontSize = (base * avail / k.scrollWidth * 0.97) + 'px';
-    }
-}
-
-function setupFormulaPopover() {
-    const btn = document.querySelector('.info-btn');
-    const popup = document.querySelector('.info-popup');
-    if (!btn || !popup) return;
-
-    const position = () => {
-        const r = btn.getBoundingClientRect();
-        const margin = 14;
-        const w = popup.offsetWidth;
-        let left = r.left + r.width / 2 - w / 2;
-        left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
-        popup.style.left = left + 'px';
-        popup.style.top = (r.bottom + 10) + 'px';
-    };
-
-    const open = () => {
-        fitFormula();
-        position();
-        popup.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-    };
-    const close = () => {
-        popup.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-    };
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        popup.classList.contains('open') ? close() : open();
-    });
-    document.addEventListener('click', (e) => {
-        if (popup.classList.contains('open') && !popup.contains(e.target)) close();
-    });
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close();
-    });
-    window.addEventListener('resize', () => {
-        if (popup.classList.contains('open')) position();
-    });
-}
 
 // Miller index labels
 function createFaceTexture(label, family, isTriangle, isSelected, isReference, textCenter) {
