@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>Si Cube</title>
+  <g stroke="#0b1220" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M57.99 24.33 L55.1 18.14 L48.38 9.02 Z" fill="#8b5cf6"/>
+    <path d="M6.01 24.33 L15.62 9.02 L8.9 18.14 Z" fill="#8b5cf6"/>
+    <path d="M32 14.03 L48.38 9.02 L32 5 L15.62 9.02 Z" fill="#14b8a6"/>
+    <path d="M41.64 53.71 L22.36 53.71 L32 59 Z" fill="#8b5cf6"/>
+    <path d="M57.99 24.33 L42.44 31.42 L41.64 53.71 L56.2 44.77 Z" fill="#14b8a6"/>
+    <path d="M22.36 53.71 L21.56 31.42 L6.01 24.33 L7.8 44.77 Z" fill="#14b8a6"/>
+    <path d="M21.56 31.42 L32 14.03 L15.62 9.02 L6.01 24.33 Z" fill="#f97316"/>
+    <path d="M42.44 31.42 L57.99 24.33 L48.38 9.02 L32 14.03 Z" fill="#f97316"/>
+    <path d="M41.64 53.71 L42.44 31.42 L21.56 31.42 L22.36 53.71 Z" fill="#f97316"/>
+    <path d="M42.44 31.42 L32 14.03 L21.56 31.42 Z" fill="#8b5cf6"/>
+  </g>
+</svg>
