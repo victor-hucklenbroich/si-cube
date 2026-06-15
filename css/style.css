@@ -6,35 +6,35 @@
 }
 
 body, body[data-theme="dark"] {
-  --accent-100: #41ccb4;
-  --accent-110: #f59e0b;
-  --accent-111: #a78bfa;
-  --bg: #383838;
-  --scene-bg: #262626;
-  --surface: rgba(20, 21, 22, 0.95);
+  --accent-100: #14b8a6;
+  --accent-110: #f97316;
+  --accent-111: #8b5cf6;
+  --bg: #121419;
+  --scene-bg: #1b1e24;
+  --surface: rgba(22, 25, 31, 0.95);
   --surface-hover: rgba(255, 255, 255, 0.06);
-  --surface-border: rgba(255, 255, 255, 0.06);
-  --text: #e0e4ec;
-  --text-dim: #6b7280;
-  --text-bright: #ffffff;
-  --edge-color: #3a3f4a;
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --text: #e2e8f0;
+  --text-dim: #8b94a3;
+  --text-bright: #f8fafc;
+  --edge-color: #cbd5e1;
   --face-bg-mix: 60;
   --face-text-alpha: 1.0;
 }
 
 body[data-theme="light"] {
-  --accent-100: #19cc9c;
-  --accent-110: #f5490b;
-  --accent-111: #761aff;
-  --bg: #e8e8e8;
-  --scene-bg: #d4d4d4;
-  --surface: rgba(255, 255, 255, 0.92);
-  --surface-hover: rgba(0, 0, 0, 0.04);
-  --surface-border: rgba(0, 0, 0, 0.08);
+  --accent-100: #0d9488;
+  --accent-110: #ea580c;
+  --accent-111: #7c3aed;
+  --bg: #eceff4;
+  --scene-bg: #e2e8f0;
+  --surface: rgba(255, 255, 255, 0.94);
+  --surface-hover: rgba(15, 23, 42, 0.05);
+  --surface-border: rgba(15, 23, 42, 0.10);
   --text: #1f2937;
-  --text-dim: #6b7280;
-  --text-bright: #111827;
-  --edge-color: #9ca3af;
+  --text-dim: #64748b;
+  --text-bright: #0f172a;
+  --edge-color: #475569;
   --face-bg-mix: 210;
   --face-text-alpha: 0.9;
 }
@@ -144,9 +144,9 @@ canvas { display: block; }
   border-radius: 4px;
   letter-spacing: 0.05em;
 }
-.family-100 { background: rgba(94,234,212,.12); color: var(--accent-100); border: 1px solid rgba(94,234,212,.2); }
-.family-110 { background: rgba(245,158,11,.12); color: var(--accent-110); border: 1px solid rgba(245,158,11,.2); }
-.family-111 { background: rgba(167,139,250,.12); color: var(--accent-111); border: 1px solid rgba(167,139,250,.2); }
+.family-100 { background: color-mix(in srgb, var(--accent-100) 16%, transparent); color: var(--accent-100); border: 1px solid color-mix(in srgb, var(--accent-100) 38%, transparent); }
+.family-110 { background: color-mix(in srgb, var(--accent-110) 16%, transparent); color: var(--accent-110); border: 1px solid color-mix(in srgb, var(--accent-110) 38%, transparent); }
+.family-111 { background: color-mix(in srgb, var(--accent-111) 16%, transparent); color: var(--accent-111); border: 1px solid color-mix(in srgb, var(--accent-111) 38%, transparent); }
 
 #angle-table {
   margin: 10px 12px 0;

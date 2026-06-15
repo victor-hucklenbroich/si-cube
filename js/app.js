@@ -17,7 +17,6 @@ const translations = {
         rotate: "Drehen",
         reference: "Referenzebene",
         select: "Auswählen",
-        family: "Äquivalente",
         zoom: "Zoom",
         hint_empty: "Rechtsklick auf eine Ebene (•••) um diese auszuwählen. Shift+Rechtsklick wählt alle äquialenten Ebenen {•••} aus.",
         hint_single: "Wähle eine weitere Ebene, um dessen Winkel zu vergleichen.",
@@ -33,7 +32,6 @@ const translations = {
         rotate: "Rotate",
         reference: "Reference Plane",
         select: "Select",
-        family: "Equivalents",
         zoom: "Zoom",
         hint_empty: "Right-click a plane (•••) to select. Shift+right-click selects all equivalent planes {•••}.",
         hint_single: "Select another plane to compare their angles.",
@@ -44,29 +42,29 @@ const translations = {
 
 const THEME_COLORS = {
     dark: {
-        sceneBg: 0x212121,
-        faceColor: "dimgrey",
-        textColor: "snow",
-        edgeColor: 0xB3B3B3,
+        sceneBg: 0x1b1e24,
+        faceColor: "#565b66",
+        textColor: "#f1f5f9",
+        edgeColor: 0xcbd5e1,
         faceTextAlpha: 1.0,
     },
     light: {
-        sceneBg: 0xF2F2F2,
-        faceColor: "white",
-        textColor: "black",
-        edgeColor: 0x595959,
-        faceTextAlpha: 0.85,
+        sceneBg: 0xe2e8f0,
+        faceColor: "#ffffff",
+        textColor: "#1f2937",
+        edgeColor: 0x475569,
+        faceTextAlpha: 0.9,
     }
 };
 
 const PLANE_COLORS = {
-    dark:  { '100': '#41ccb4', '110': '#f59e0b', '111': '#a78bfa' },
-    light: { '100': '#19cc9c', '110': '#f5490b', '111': '#761aff' },
+    dark:  { '100': '#14b8a6', '110': '#f97316', '111': '#8b5cf6' },
+    light: { '100': '#0d9488', '110': '#ea580c', '111': '#7c3aed' },
 };
 
 const REFERENCE_COLORS = {
-    dark: '#ff5d8f',
-    light: '#db2777',
+    dark: '#f43f5e',
+    light: '#e11d48',
 };
 
 const DEFAULT_CAM = {x: 3.8, y: 2.5, z: 3.8};
