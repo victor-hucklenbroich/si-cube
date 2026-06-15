@@ -64,6 +64,11 @@ const PLANE_COLORS = {
     light: { '100': '#19cc9c', '110': '#f5490b', '111': '#761aff' },
 };
 
+const REFERENCE_COLORS = {
+    dark: '#ff5d8f',
+    light: '#db2777',
+};
+
 const DEFAULT_CAM = {x: 3.8, y: 2.5, z: 3.8};
 
 let scene, camera, renderer, controls;
@@ -74,6 +79,7 @@ let animTarget = null;
 let faceMeshes = [];
 let edgeLines = null;
 let cubeData = null;
+let referenceIdx = -1;
 
 // Selection state
 const selectedFaces = new Set();
@@ -267,7 +273,7 @@ function setupFormulaPopover() {
 }
 
 // Miller index labels
-function createFaceTexture(label, family, isTriangle, isSelected, textCenter) {
+function createFaceTexture(label, family, isTriangle, isSelected, isReference, textCenter) {
     const size = 256;
     const canvas = document.createElement('canvas');
     canvas.width = size;
@@ -276,7 +282,9 @@ function createFaceTexture(label, family, isTriangle, isSelected, textCenter) {
 
     const tc = THEME_COLORS[settings.theme];
 
-    ctx.fillStyle = isSelected ? PLANE_COLORS[settings.theme][family] : tc.faceColor;
+    if (isReference) ctx.fillStyle = REFERENCE_COLORS[settings.theme];
+    else if (isSelected) ctx.fillStyle = PLANE_COLORS[settings.theme][family];
+    else ctx.fillStyle = tc.faceColor;
     ctx.fillRect(0, 0, size, size);
 
     // Text
@@ -285,8 +293,9 @@ function createFaceTexture(label, family, isTriangle, isSelected, textCenter) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const textColor = isSelected ? '#ffffff' : tc.textColor;
-    ctx.globalAlpha = isSelected ? 1.0 : tc.faceTextAlpha;
+    const highlighted = isSelected || isReference;
+    const textColor = highlighted ? '#ffffff' : tc.textColor;
+    ctx.globalAlpha = highlighted ? 1.0 : tc.faceTextAlpha;
     ctx.fillStyle = textColor;
 
     const tcu = textCenter ? textCenter.u : 0.5;
@@ -323,10 +332,16 @@ function createFaceTexture(label, family, isTriangle, isSelected, textCenter) {
 }
 
 function rebuildFaceTextures() {
+    referenceIdx = selectedFaces.size > 0 ? selectedFaces.values().next().value : -1;
     faceMeshes.forEach((fm, idx) => {
         const isSelected = selectedFaces.has(idx);
+        const isReference = idx === referenceIdx;
         if (fm.mesh.material.map) fm.mesh.material.map.dispose();
-        fm.mesh.material.map = createFaceTexture(fm.label, fm.family, fm.isTriangle, isSelected, fm.textCenter);
+        fm.mesh.material.map = createFaceTexture(fm.label, fm.family, fm.isTriangle, isSelected, isReference, fm.textCenter);
+        if (!isReference) {
+            fm.mesh.material.emissive.setHex(0x000000);
+            fm.mesh.material.emissiveIntensity = 1;
+        }
         fm.mesh.material.needsUpdate = true;
     });
 }
@@ -411,7 +426,7 @@ function buildCube(cube) {
         geom.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
         geom.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
 
-        const texture = createFaceTexture(face.label, face.family, isTriangle, false, uvCentroid);
+        const texture = createFaceTexture(face.label, face.family, isTriangle, false, false, uvCentroid);
         const mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({
             map: texture,
             flatShading: true,
@@ -639,6 +654,14 @@ function animate() {
         }
     } else {
         controls.update();
+    }
+
+    // Gentle breathing glow on the reference plane so it stands out
+    if (referenceIdx >= 0 && faceMeshes[referenceIdx]) {
+        const mat = faceMeshes[referenceIdx].mesh.material;
+        const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.004);
+        mat.emissive.set(REFERENCE_COLORS[settings.theme]);
+        mat.emissiveIntensity = 0.12 + 0.33 * pulse;
     }
 
     updateReferenceFace();
