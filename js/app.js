@@ -21,6 +21,8 @@ const translations = {
         zoom: "Zoom",
         hint_empty: "Rechtsklick auf eine Ebene (•••) um diese auszuwählen. Shift+Rechtsklick wählt alle äquialenten Ebenen {•••} aus.",
         hint_single: "Wähle eine weitere Ebene, um dessen Winkel zu vergleichen.",
+        formula_plane1: "Indizes Ebene 1",
+        formula_plane2: "Indizes Ebene 2",
     },
     en: {
         page: "Silicon Cube",
@@ -35,6 +37,8 @@ const translations = {
         zoom: "Zoom",
         hint_empty: "Right-click a plane (•••) to select. Shift+right-click selects all equivalent planes {•••}.",
         hint_single: "Select another plane to compare their angles.",
+        formula_plane1: "indices of plane 1",
+        formula_plane2: "indices of plane 2",
     },
 };
 
@@ -123,6 +127,8 @@ async function init() {
     buildCube(cubeData);
     updateReferenceFace();
     updateAngleList();
+    renderFormula();
+    setupFormulaPopover();
 
     // Events
     window.addEventListener('resize', onResize);
@@ -193,8 +199,75 @@ window.switchLanguage = function () {
     applyLanguage(settings.lang === 'de' ? 'en' : 'de');
 };
 
+const FORMULA_FRAC = String.raw`\dfrac{h\,h'+k\,k'+l\,l'}{\sqrt{(h^2+k^2+l^2)\,(h'^2+k'^2+l'^2)}}`;
+const FORMULA_LATEX = String.raw`\begin{aligned}
+\cos(\alpha) &= ${FORMULA_FRAC} \\[6pt]
+\Rightarrow\quad \alpha &= \cos^{-1}\!\left(${FORMULA_FRAC}\right)
+\end{aligned}`;
+
+function renderFormula() {
+    const el = document.getElementById('formula');
+    if (!el || !window.katex) return;
+    katex.render(FORMULA_LATEX, el, {throwOnError: false, displayMode: true});
+    fitFormula();
+}
+
+function fitFormula() {
+    const el = document.getElementById('formula');
+    if (!el) return;
+    el.style.fontSize = '';
+    const k = el.querySelector('.katex-display') || el.firstElementChild;
+    if (!k) return;
+    const avail = el.clientWidth;
+    if (avail > 0 && k.scrollWidth > avail) {
+        const base = parseFloat(getComputedStyle(el).fontSize);
+        el.style.fontSize = (base * avail / k.scrollWidth * 0.97) + 'px';
+    }
+}
+
+function setupFormulaPopover() {
+    const btn = document.querySelector('.info-btn');
+    const popup = document.querySelector('.info-popup');
+    if (!btn || !popup) return;
+
+    const position = () => {
+        const r = btn.getBoundingClientRect();
+        const margin = 14;
+        const w = popup.offsetWidth;
+        let left = r.left + r.width / 2 - w / 2;
+        left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+        popup.style.left = left + 'px';
+        popup.style.top = (r.bottom + 10) + 'px';
+    };
+
+    const open = () => {
+        fitFormula();
+        position();
+        popup.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+    };
+    const close = () => {
+        popup.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+    };
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        popup.classList.contains('open') ? close() : open();
+    });
+    document.addEventListener('click', (e) => {
+        if (popup.classList.contains('open') && !popup.contains(e.target)) close();
+    });
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+    });
+    window.addEventListener('resize', () => {
+        if (popup.classList.contains('open')) position();
+    });
+}
+
 // Miller index labels
-function createFaceTexture(label, family, isTriangle, isSelected) {
+function createFaceTexture(label, family, isTriangle, isSelected, textCenter) {
     const size = 256;
     const canvas = document.createElement('canvas');
     canvas.width = size;
@@ -216,7 +289,10 @@ function createFaceTexture(label, family, isTriangle, isSelected) {
     ctx.globalAlpha = isSelected ? 1.0 : tc.faceTextAlpha;
     ctx.fillStyle = textColor;
 
-    const cx = size / 2, cy = size / 2;
+    const tcu = textCenter ? textCenter.u : 0.5;
+    const tcv = textCenter ? textCenter.v : 0.5;
+    const cx = tcu * size;
+    const cy = (1 - tcv) * size;
     const parts = label.map((v) => ({val: Math.abs(v), neg: v < 0}));
     const spacing = fontSize * 0.55;
     const totalW = spacing * (parts.length - 1);
@@ -233,8 +309,8 @@ function createFaceTexture(label, family, isTriangle, isSelected) {
             ctx.strokeStyle = textColor;
             ctx.lineWidth = 2.65;
             ctx.beginPath();
-            ctx.moveTo(x - w, cy - fontSize * 0.52);
-            ctx.lineTo(x + w, cy - fontSize * 0.52);
+            ctx.moveTo(x - w, cy + fontSize * 0.5);
+            ctx.lineTo(x + w, cy + fontSize * 0.5);
             ctx.stroke();
         }
     });
@@ -250,7 +326,7 @@ function rebuildFaceTextures() {
     faceMeshes.forEach((fm, idx) => {
         const isSelected = selectedFaces.has(idx);
         if (fm.mesh.material.map) fm.mesh.material.map.dispose();
-        fm.mesh.material.map = createFaceTexture(fm.label, fm.family, fm.isTriangle, isSelected);
+        fm.mesh.material.map = createFaceTexture(fm.label, fm.family, fm.isTriangle, isSelected, fm.textCenter);
         fm.mesh.material.needsUpdate = true;
     });
 }
@@ -277,10 +353,18 @@ function computeFaceUVs(faceVerts3D, normal) {
         mxY = Math.max(mxY, p.y);
     });
     const rX = mxX - mnX || 1, rY = mxY - mnY || 1, pad = 0.02;
-    return pts.map((p) => ({
+    const uvs = pts.map((p) => ({
         u: pad + (1 - 2 * pad) * (p.x - mnX) / rX,
         v: pad + (1 - 2 * pad) * (p.y - mnY) / rY,
     }));
+
+    // Geometric centroid of the face in UV space
+    let cu = 0, cv = 0;
+    uvs.forEach((p) => { cu += p.u; cv += p.v; });
+    cu /= uvs.length;
+    cv /= uvs.length;
+
+    return { uvs, centroid: { u: cu, v: cv } };
 }
 
 function buildCube(cube) {
@@ -304,7 +388,7 @@ function buildCube(cube) {
         const idxSet = new Set();
         face.triangles.forEach((tri) => tri.forEach((i) => idxSet.add(i)));
         const uArr = Array.from(idxSet);
-        const uvs = computeFaceUVs(uArr.map((i) => vertices[i]), n);
+        const { uvs, centroid: uvCentroid } = computeFaceUVs(uArr.map((i) => vertices[i]), n);
         const idxToUV = {};
         uArr.forEach((vi, i) => {
             idxToUV[vi] = uvs[i];
@@ -327,14 +411,14 @@ function buildCube(cube) {
         geom.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
         geom.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
 
-        const texture = createFaceTexture(face.label, face.family, isTriangle, false);
+        const texture = createFaceTexture(face.label, face.family, isTriangle, false, uvCentroid);
         const mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({
             map: texture,
             flatShading: true,
             side: THREE.DoubleSide,
         }));
         scene.add(mesh);
-        faceMeshes.push({mesh, label: face.label, family: face.family, isTriangle});
+        faceMeshes.push({mesh, label: face.label, family: face.family, isTriangle, textCenter: uvCentroid});
 
         // Boundary edges
         const ec = {};
@@ -365,7 +449,7 @@ function buildCube(cube) {
 // Miller index formatting
 function formatMillerIndexHTML(hkl) {
     return '(' + hkl.map((v) =>
-        v < 0 ? '<span style="text-decoration:overline">' + Math.abs(v) + '</span>' : '' + v
+        v < 0 ? '<span style="text-decoration:underline;text-underline-offset:0.14em">' + Math.abs(v) + '</span>' : '' + v
     ).join(' ') + ')';
 }
 

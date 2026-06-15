@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page"></title>
+  <title id="page" data-i18n="page"></title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
   <script type="importmap">
   {
     "imports": {
@@ -40,7 +42,19 @@
 
     <div id="angle-table">
       <div class="angle-header">
-        <span class="hud-label" data-i18n="angles"></span>
+        <div class="header-left">
+          <span class="hud-label" data-i18n="angles"></span>
+          <span class="info-wrapper">
+            <button class="info-btn" type="button" aria-label="Show formula" aria-expanded="false">i</button>
+            <div class="info-popup" role="dialog" aria-label="Angle formula">
+              <div class="formula" id="formula"></div>
+              <div class="formula-legend">
+                <div><span class="leg-key">(h, k, l)</span> = <span data-i18n="formula_plane1"></span></div>
+                <div><span class="leg-key">(h′, k′, l′)</span> = <span data-i18n="formula_plane2"></span></div>
+              </div>
+            </div>
+          </span>
+        </div>
         <button id="clear-btn" onclick="clearSelection()" title="Clear (Esc)" aria-label="Clear selection">×</button>
       </div>
       <div id="angle-list"></div>

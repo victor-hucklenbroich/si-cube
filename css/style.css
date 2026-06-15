@@ -194,6 +194,91 @@ canvas { display: block; }
   border-color: var(--text-dim);
 }
 
+.angle-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.info-btn {
+  background: var(--surface-hover);
+  border: 1px solid var(--surface-border);
+  border-radius: 50%;
+  color: var(--text);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.info-btn:hover,
+.info-btn[aria-expanded="true"] {
+  color: var(--text-bright);
+  border-color: var(--accent-100);
+  background: var(--surface-hover);
+}
+
+.info-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 18px 18px 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s, visibility 0.15s, transform 0.15s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.info-popup.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Formula (rendered by KaTeX) */
+.formula {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-bright);
+  margin: 2px 0 16px;
+}
+.formula .katex { font-size: 1.05em; }
+.formula .katex-display { margin: 0; }
+
+.formula-legend {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  padding-top: 10px;
+  border-top: 1px solid var(--surface-border);
+}
+.formula-legend > div { margin-top: 3px; }
+.formula-legend .leg-key { color: var(--text); }
+
 #angle-list {
   flex: 1;
   overflow-y: auto;
