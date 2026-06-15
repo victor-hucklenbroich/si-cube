@@ -11,3 +11,7 @@
 .idea/
 *.swp
 *.swo
+
+# Resources
+*.pdf
+*.stl
