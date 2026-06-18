@@ -383,13 +383,112 @@ canvas { display: block; }
 #version-text {
   position: fixed;
   bottom: 14px;
-  left: calc(70px);
-  transform: translateX(-50%);
+  left: 16px;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--mono);
   font-size: 11px;
   color: var(--text-dim);
   pointer-events: none;
+}
+#version-text .ver-sep { opacity: 0.5; }
+#impressum-link {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+#impressum-link:hover { color: var(--text); }
+
+/* Impressum modal */
+#impressum-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s, visibility 0.18s;
+}
+#impressum-overlay.open { opacity: 1; visibility: visible; }
+
+#impressum-modal {
+  position: relative;
+  width: min(440px, calc(100vw - 40px));
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 24px 24px 22px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateY(6px) scale(0.98);
+  transition: transform 0.18s;
+}
+#impressum-overlay.open #impressum-modal { transform: translateY(0) scale(1); }
+
+#impressum-modal h2 {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+}
+
+#impressum-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  padding: 4px;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+#impressum-close:hover { color: var(--text-bright); }
+
+#impressum-body {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+#impressum-body .imp-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 14px;
+  margin-bottom: 2px;
+}
+#impressum-body a { color: var(--accent-100); text-decoration: none; }
+#impressum-body a:hover { text-decoration: underline; }
+#impressum-body .imp-disclaimer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--surface-border);
+  font-size: 12px;
+  color: var(--text-dim);
 }
 
 #angle-list::-webkit-scrollbar { width: 4px; }

@@ -82,7 +82,9 @@ async function init() {
     renderer.domElement.addEventListener('pointerup', onPointerUp);
     renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && selectedFaces.size > 0) clearSelection();
+        if (e.key !== 'Escape') return;
+        if (impressumOverlay().classList.contains('open')) closeImpressum();
+        else if (selectedFaces.size > 0) clearSelection();
     });
 
     animate();
@@ -118,6 +120,9 @@ function applyLanguage(lang) {
     settings.lang = lang;
     applyTranslations(lang);
 
+    const impBody = document.getElementById('impressum-body');
+    if (impBody) impBody.innerHTML = translations[lang].impressum_html;
+
     // Force HUD re-render so reference-mode label gets correct translation
     currentRefIdx = -1;
     currentRefMode = null;
@@ -129,6 +134,23 @@ function applyLanguage(lang) {
 
 window.switchLanguage = function () {
     applyLanguage(settings.lang === 'de' ? 'en' : 'de');
+};
+
+// Impressum modal
+const impressumOverlay = () => document.getElementById('impressum-overlay');
+
+window.openImpressum = function () {
+    impressumOverlay().classList.add('open');
+};
+
+function closeImpressum() {
+    impressumOverlay().classList.remove('open');
+}
+
+window.closeImpressum = closeImpressum;
+
+window.closeImpressumBackdrop = function (e) {
+    if (e.target === impressumOverlay()) closeImpressum();
 };
 
 // Miller index labels

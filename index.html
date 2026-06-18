@@ -89,7 +89,17 @@
   <script type="module" src="js/main.js"></script>
 
   <div id="version-text">
-    <span>v1.2.0</span>
+    <span class="ver">v1.2.0</span>
+    <span class="ver-sep">·</span>
+    <button id="impressum-link" type="button" data-i18n="impressum" onclick="openImpressum()"></button>
+  </div>
+
+  <div id="impressum-overlay" onclick="closeImpressumBackdrop(event)">
+    <div id="impressum-modal" role="dialog" aria-modal="true" aria-labelledby="impressum-title">
+      <button id="impressum-close" type="button" onclick="closeImpressum()" aria-label="Close">×</button>
+      <h2 id="impressum-title" data-i18n="impressum"></h2>
+      <div id="impressum-body"></div>
+    </div>
   </div>
 
 </body>
