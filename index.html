@@ -36,8 +36,8 @@
       <p class="subtitle" data-i18n="subtitle"></p>
     </div>
 
-    <div id="current-face">
-      <div class="hud-label" id="face-label" data-i18n="facing"></div>
+    <div id="current-face" style="display:none;">
+      <div class="hud-label" id="face-label" data-i18n="reference"></div>
       <div style="display:flex;align-items:baseline;gap:12px;">
         <div id="facing-index" class="miller-big">(1 0 0)</div>
         <div id="facing-family" class="family-tag family-100">{100}</div>
@@ -81,10 +81,15 @@
     <span class="ctrl-icon">◎</span><span data-i18n="zoom"></span>
   </div>
 
+  <div class="info-popup" id="calc-popup" role="dialog" aria-label="Angle calculation">
+    <div class="calc-header" id="calc-header"></div>
+    <div class="formula" id="calc-formula"></div>
+  </div>
+
   <script type="module" src="js/main.js"></script>
 
   <div id="version-text">
-    <span>v1.1.0</span>
+    <span>v1.2.0</span>
   </div>
 
 </body>

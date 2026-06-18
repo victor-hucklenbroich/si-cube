@@ -3,7 +3,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 import {THEME_COLORS, PLANE_COLORS, REFERENCE_COLORS, DEFAULT_CAM} from './config.js';
 import {translations, getPreferredLanguage, applyTranslations} from './i18n.js';
-import {renderFormula, setupFormulaPopover} from './formula.js';
+import {renderFormula, setupFormulaPopover, setupAngleCalcPopover, showAngleCalc, closeAngleCalc} from './formula.js';
 
 
 const settings = {
@@ -15,7 +15,6 @@ let scene, camera, renderer, controls;
 let facesData = [];
 let currentRefIdx = -1;
 let currentRefMode = null;
-let animTarget = null;
 let faceMeshes = [];
 let edgeLines = null;
 let cubeData = null;
@@ -75,6 +74,7 @@ async function init() {
     updateAngleList();
     renderFormula();
     setupFormulaPopover();
+    setupAngleCalcPopover();
 
     // Events
     window.addEventListener('resize', onResize);
@@ -327,28 +327,13 @@ function formatMillerIndexHTML(hkl) {
     ).join(' ') + ')';
 }
 
-// Facing detection
-function findFacingPlane() {
-    const camDir = new THREE.Vector3();
-    camera.getWorldDirection(camDir);
-    let bestIdx = 0, bestDot = -Infinity;
-    facesData.forEach((face, i) => {
-        const dot = -camDir.dot(face.normal);
-        if (dot > bestDot) {
-            bestDot = dot;
-            bestIdx = i;
-        }
-    });
-    return bestIdx;
-}
-
 function angleBetween(n1, n2) {
-    return THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(n1.dot(n2), -1, 1)));
+    // Use the absolute dot product so the angle is always <= 90 degrees
+    return THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(Math.abs(n1.dot(n2)), 0, 1)));
 }
 
 // Selection
 function onPointerDown(e) {
-    if (animTarget) { animTarget = null; controls.enableDamping = true; }
     if (e.button === 2) rmbDownPos = { x: e.clientX, y: e.clientY };
 }
 
@@ -414,40 +399,41 @@ function clearSelection() {
 
 window.clearSelection = clearSelection;
 
-window.navigateToFace = function (faceIdx) {
-    const face = facesData[faceIdx];
-    const radius = camera.position.length();
-    animTarget = {
-        position: face.normal.clone().multiplyScalar(radius),
-        startPos: camera.position.clone(),
-        startTarget: controls.target.clone(),
-        endTarget: new THREE.Vector3(0, 0, 0),
-        progress: 0,
-    };
-    controls.enableDamping = false;
+window.openAngleCalc = function (e, refIdx, otherIdx) {
+    e.stopPropagation();
+    const ref = facesData[refIdx];
+    const other = facesData[otherIdx];
+    const header =
+        `<span class="dot dot-${ref.family}"></span>` +
+        `<span class="idx">${formatMillerIndexHTML(ref.label)}</span>` +
+        `<span class="calc-sep">∠</span>` +
+        `<span class="dot dot-${other.family}"></span>` +
+        `<span class="idx">${formatMillerIndexHTML(other.label)}</span>`;
+    showAngleCalc(e.currentTarget, header, ref.label, other.label);
 };
 
 function updateReferenceFace() {
-    let mode, idx;
-    if (selectedFaces.size > 0) {
-        mode = 'selected';
-        idx = selectedFaces.values().next().value;
-    } else {
-        mode = 'facing';
-        idx = findFacingPlane();
+    const faceEl = document.getElementById('current-face');
+
+    if (selectedFaces.size === 0) {
+        currentRefIdx = -1;
+        currentRefMode = null;
+        faceEl.style.display = 'none';
+        return;
     }
 
-    if (idx === currentRefIdx && mode === currentRefMode) return;
+    const idx = selectedFaces.values().next().value;
+    if (idx === currentRefIdx && currentRefMode === 'selected') return;
     currentRefIdx = idx;
-    currentRefMode = mode;
+    currentRefMode = 'selected';
+    faceEl.style.display = '';
 
     const face = facesData[idx];
     document.getElementById('facing-index').innerHTML = formatMillerIndexHTML(face.label);
     const familyEl = document.getElementById('facing-family');
     familyEl.textContent = '{' + face.family + '}';
     familyEl.className = 'family-tag family-' + face.family;
-    document.getElementById('face-label').textContent =
-        translations[settings.lang][mode === 'selected' ? 'reference' : 'facing'];
+    document.getElementById('face-label').textContent = translations[settings.lang].reference;
 }
 
 function updateAngleList() {
@@ -456,6 +442,9 @@ function updateAngleList() {
     const t = translations[settings.lang];
 
     const selected = Array.from(selectedFaces);
+
+    // The selection changed, so any open calculation popover is now outdated
+    closeAngleCalc();
 
     if (clearBtn) clearBtn.style.visibility = selected.length > 0 ? 'visible' : 'hidden';
 
@@ -481,7 +470,7 @@ function updateAngleList() {
     others.sort((a, b) => a.angle - b.angle);
 
     listEl.innerHTML = others.map(o => `
-        <div class="angle-row" onclick="navigateToFace(${o.idx})">
+        <div class="angle-row" onclick="openAngleCalc(event, ${refIdx}, ${o.idx})">
             <span class="dot dot-${o.face.family}"></span>
             <span class="idx">${formatMillerIndexHTML(o.face.label)}</span>
             <span class="deg">${o.angle.toFixed(1)}°</span>
@@ -499,31 +488,16 @@ function onResize() {
 function animate() {
     requestAnimationFrame(animate);
 
-    if (animTarget) {
-        animTarget.progress += 0.03;
-        const t = Math.min(1, animTarget.progress);
-        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        camera.position.lerpVectors(animTarget.startPos, animTarget.position, ease);
-        controls.target.lerpVectors(animTarget.startTarget, animTarget.endTarget, ease);
-        camera.lookAt(controls.target);
-        controls.update();
-        if (t >= 1) {
-            animTarget = null;
-            controls.enableDamping = true;
-        }
-    } else {
-        controls.update();
-    }
+    controls.update();
 
     // Gentle breathing glow on the reference plane so it stands out
     if (referenceIdx >= 0 && faceMeshes[referenceIdx]) {
         const mat = faceMeshes[referenceIdx].mesh.material;
         const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.004);
         mat.emissive.set(REFERENCE_COLORS[settings.theme]);
-        mat.emissiveIntensity = 0.12 + 0.33 * pulse;
+        mat.emissiveIntensity = 0.15 + 0.33 * pulse;
     }
 
-    updateReferenceFace();
     renderer.render(scene, camera);
 }
 
