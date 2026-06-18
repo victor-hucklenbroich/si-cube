@@ -327,21 +327,6 @@ function formatMillerIndexHTML(hkl) {
     ).join(' ') + ')';
 }
 
-// Facing detection
-function findFacingPlane() {
-    const camDir = new THREE.Vector3();
-    camera.getWorldDirection(camDir);
-    let bestIdx = 0, bestDot = -Infinity;
-    facesData.forEach((face, i) => {
-        const dot = -camDir.dot(face.normal);
-        if (dot > bestDot) {
-            bestDot = dot;
-            bestIdx = i;
-        }
-    });
-    return bestIdx;
-}
-
 function angleBetween(n1, n2) {
     // Use the absolute dot product so the angle is always <= 90 degrees
     return THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(Math.abs(n1.dot(n2)), 0, 1)));
@@ -429,26 +414,27 @@ window.navigateToFace = function (faceIdx) {
 };
 
 function updateReferenceFace() {
-    let mode, idx;
-    if (selectedFaces.size > 0) {
-        mode = 'selected';
-        idx = selectedFaces.values().next().value;
-    } else {
-        mode = 'facing';
-        idx = findFacingPlane();
+    const faceEl = document.getElementById('current-face');
+
+    if (selectedFaces.size === 0) {
+        currentRefIdx = -1;
+        currentRefMode = null;
+        faceEl.style.display = 'none';
+        return;
     }
 
-    if (idx === currentRefIdx && mode === currentRefMode) return;
+    const idx = selectedFaces.values().next().value;
+    if (idx === currentRefIdx && currentRefMode === 'selected') return;
     currentRefIdx = idx;
-    currentRefMode = mode;
+    currentRefMode = 'selected';
+    faceEl.style.display = '';
 
     const face = facesData[idx];
     document.getElementById('facing-index').innerHTML = formatMillerIndexHTML(face.label);
     const familyEl = document.getElementById('facing-family');
     familyEl.textContent = '{' + face.family + '}';
     familyEl.className = 'family-tag family-' + face.family;
-    document.getElementById('face-label').textContent =
-        translations[settings.lang][mode === 'selected' ? 'reference' : 'facing'];
+    document.getElementById('face-label').textContent = translations[settings.lang].reference;
 }
 
 function updateAngleList() {
@@ -521,10 +507,9 @@ function animate() {
         const mat = faceMeshes[referenceIdx].mesh.material;
         const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.004);
         mat.emissive.set(REFERENCE_COLORS[settings.theme]);
-        mat.emissiveIntensity = 0.12 + 0.33 * pulse;
+        mat.emissiveIntensity = 0.15 + 0.33 * pulse;
     }
 
-    updateReferenceFace();
     renderer.render(scene, camera);
 }
 
