@@ -1,6 +1,6 @@
 # Silicon Cube (Miller Index Viewer)
 
-**Version:** v1.1.0
+**Version:** v1.2.0
 
 Compact web app to accompany the TUM lecture MW0080 Microsensor & Actuators. 
 Intended to make the lectures Silicon cube more accessible. 
