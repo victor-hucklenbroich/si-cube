@@ -279,6 +279,26 @@ canvas { display: block; }
 .formula-legend > div { margin-top: 3px; }
 .formula-legend .leg-key { color: var(--text); }
 
+/* Angle calculation popover */
+.calc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--text-bright);
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--surface-border);
+}
+.calc-header .dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.calc-header .idx { color: var(--text-bright); }
+.calc-header .calc-sep { color: var(--text-dim); margin: 0 4px; }
+
+#calc-formula { margin: 12px 0 2px; }
+
 #angle-list {
   flex: 1;
   overflow-y: auto;
