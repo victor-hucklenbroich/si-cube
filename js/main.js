@@ -343,7 +343,8 @@ function findFacingPlane() {
 }
 
 function angleBetween(n1, n2) {
-    return THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(n1.dot(n2), -1, 1)));
+    // Use the absolute dot product so the angle is always <= 90 degrees
+    return THREE.MathUtils.radToDeg(Math.acos(THREE.MathUtils.clamp(Math.abs(n1.dot(n2)), 0, 1)));
 }
 
 // Selection
