@@ -1,9 +1,9 @@
-# Silicon Cube (Miller Index Viewer)
+# Silicon Cube <img src="./assets/apple-touch-icon.png" alt="drawing" width="35"/>
 
 **Version:** v1.3.0-SNAPSHOT
 
 Compact web app to accompany the TUM lecture MW0080 Microsensor & Actuators. 
-Intended to make the lectures Silicon cube more accessible. 
+Intended to make the lectures Silicon cube more accessible and help with the visualization of Miller indices and crystal plane angles.
 
 __Note_ that this is an independent student project and not officially affiliated with TUM._
 
