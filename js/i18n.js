@@ -1,7 +1,7 @@
 
 export const translations = {
     de: {
-        page: "Silizium Würfel",
+        page: "Silizium Würfel · TUM MW0080",
         title: "Si Kristallebenen",
         subtitle: "Millersche Indizes",
         angles: "WINKEL",
@@ -24,7 +24,7 @@ export const translations = {
             <p class="imp-disclaimer">Dies ist ein unabhängiges, nicht-kommerzielles, open-source Studierendenprojekt, welches in keiner offiziellen Verbindung zur Technischen Universität München (TUM) steht und weder von ihr betrieben noch unterstützt wird.</p>`,
     },
     en: {
-        page: "Silicon Cube",
+        page: "Silicon Cube · TUM MW0080",
         title: "Si Crystal Planes",
         subtitle: "Miller Indices",
         angles: "ANGLES",
