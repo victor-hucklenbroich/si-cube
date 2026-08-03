@@ -24,10 +24,21 @@ function fitFormula(el) {
     }
 }
 
+// Angle formula popover
+let formulaBtn, formulaPopup;
+
+export function closeFormulaPopover() {
+    if (!formulaPopup) return;
+    formulaPopup.classList.remove('open');
+    if (formulaBtn) formulaBtn.setAttribute('aria-expanded', 'false');
+}
+
 export function setupFormulaPopover() {
     const btn = document.querySelector('.info-btn');
     const popup = document.querySelector('.info-popup');
     if (!btn || !popup) return;
+    formulaBtn = btn;
+    formulaPopup = popup;
 
     const position = () => {
         const r = btn.getBoundingClientRect();
@@ -52,25 +63,23 @@ export function setupFormulaPopover() {
     };
 
     const open = () => {
+        // Only one popover at a time
+        closeAngleCalc();
         fitFormula(document.getElementById('formula'));
         position();
         popup.classList.add('open');
         btn.setAttribute('aria-expanded', 'true');
     };
-    const close = () => {
-        popup.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-    };
 
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        popup.classList.contains('open') ? close() : open();
+        popup.classList.contains('open') ? closeFormulaPopover() : open();
     });
     document.addEventListener('click', (e) => {
-        if (popup.classList.contains('open') && !popup.contains(e.target)) close();
+        if (popup.classList.contains('open') && !popup.contains(e.target)) closeFormulaPopover();
     });
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close();
+        if (e.key === 'Escape') closeFormulaPopover();
     });
     window.addEventListener('resize', () => {
         if (popup.classList.contains('open')) position();
@@ -150,6 +159,7 @@ export function setupAngleCalcPopover() {
 
 export function showAngleCalc(anchor, headerHTML, ref, other) {
     if (!calcPopup || !window.katex) return;
+    closeFormulaPopover();
     calcHeaderEl.innerHTML = headerHTML;
     katex.render(buildAngleLatex(ref, other), calcFormulaEl, {throwOnError: false, displayMode: true});
     calcPopup.classList.add('open');

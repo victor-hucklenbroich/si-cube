@@ -3,7 +3,14 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 import {THEME_COLORS, PLANE_COLORS, REFERENCE_COLORS, DEFAULT_CAM} from './config.js';
 import {translations, getPreferredLanguage, applyTranslations} from './i18n.js';
-import {renderFormula, setupFormulaPopover, setupAngleCalcPopover, showAngleCalc, closeAngleCalc} from './formula.js';
+import {
+    renderFormula,
+    setupFormulaPopover,
+    setupAngleCalcPopover,
+    showAngleCalc,
+    closeAngleCalc,
+    closeFormulaPopover,
+} from './popover.js';
 
 
 const BASE_FOV = 40;
@@ -512,8 +519,9 @@ function updateAngleList() {
 
     const selected = Array.from(selectedFaces);
 
-    // The selection changed, so any open calculation popover is now outdated
+    // The selection changed, so any open popover is now stale
     closeAngleCalc();
+    closeFormulaPopover();
 
     if (clearBtn) clearBtn.style.visibility = selected.length > 0 ? 'visible' : 'hidden';
 
