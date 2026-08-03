@@ -32,11 +32,23 @@ export function setupFormulaPopover() {
     const position = () => {
         const r = btn.getBoundingClientRect();
         const margin = 14;
+        const gap = 10;
         const w = popup.offsetWidth;
+        const h = popup.offsetHeight;
+
         let left = r.left + r.width / 2 - w / 2;
         left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+
+        // Prefer below the button, but flip above when it would be cut off
+        const roomBelow = window.innerHeight - r.bottom - gap - margin;
+        const roomAbove = r.top - gap - margin;
+        let top = (h <= roomBelow || roomBelow >= roomAbove)
+            ? r.bottom + gap
+            : r.top - gap - h;
+        top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
+
         popup.style.left = left + 'px';
-        popup.style.top = (r.bottom + 10) + 'px';
+        popup.style.top = top + 'px';
     };
 
     const open = () => {
@@ -62,6 +74,14 @@ export function setupFormulaPopover() {
     });
     window.addEventListener('resize', () => {
         if (popup.classList.contains('open')) position();
+    });
+
+    const ro = new ResizeObserver(() => {
+        if (popup.classList.contains('open')) position();
+    });
+    ['#side-panel', '#angle-table'].forEach((sel) => {
+        const el = document.querySelector(sel);
+        if (el) ro.observe(el);
     });
 }
 
