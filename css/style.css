@@ -536,3 +536,39 @@ canvas { display: block; }
 #angle-list::-webkit-scrollbar { width: 4px; }
 #angle-list::-webkit-scrollbar-track { background: transparent; }
 #angle-list::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 2px; }
+
+@media (max-width: 820px) and (orientation: portrait) {
+  body { flex-direction: column; }
+
+  #canvas-container {
+    flex: 1 1 0;
+    min-height: 48dvh;
+    overflow: hidden;
+  }
+
+  #side-panel {
+    width: 100%;
+    height: auto;
+    flex: 0 0 auto;
+    max-height: 52dvh;
+    border-left: none;
+    border-top: 1px solid var(--surface-border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .footer-inner { padding-bottom: 14px; }
+
+  #panel-header { padding: 12px 16px 10px; }
+  #panel-header h1 { font-size: 15px; }
+  #panel-header .subtitle { font-size: 12px; }
+
+  #current-face { padding: 10px 14px; }
+  .miller-big { font-size: 26px; }
+
+  #angle-table {
+    flex: 0 1 auto;
+    margin-top: 8px;
+  }
+
+  #panel-footer { padding: 8px 14px 10px; }
+}

@@ -6,6 +6,8 @@ import {translations, getPreferredLanguage, applyTranslations} from './i18n.js';
 import {renderFormula, setupFormulaPopover, setupAngleCalcPopover, showAngleCalc, closeAngleCalc} from './formula.js';
 
 
+const BASE_FOV = 40;
+
 const settings = {
     theme: getPreferredTheme(),
     lang: getPreferredLanguage(),
@@ -40,7 +42,7 @@ async function init() {
 
     // Camera
     const container = document.getElementById('canvas-container');
-    camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera = new THREE.PerspectiveCamera(BASE_FOV, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(DEFAULT_CAM.x, DEFAULT_CAM.y, DEFAULT_CAM.z);
     camera.lookAt(0, 0, 0);
 
@@ -77,7 +79,7 @@ async function init() {
     setupAngleCalcPopover();
 
     // Events
-    window.addEventListener('resize', onResize);
+    new ResizeObserver(onResize).observe(container);
     renderer.domElement.addEventListener('pointerdown', onPointerDown);
     renderer.domElement.addEventListener('pointerup', onPointerUp);
     renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -502,9 +504,18 @@ function updateAngleList() {
 
 function onResize() {
     const container = document.getElementById('canvas-container');
-    camera.aspect = container.clientWidth / container.clientHeight;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    if (w === 0 || h === 0) return;
+
+    const aspect = w / h;
+    camera.fov = aspect >= 1
+        ? BASE_FOV
+        : THREE.MathUtils.radToDeg(
+            2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(BASE_FOV) / 2) / aspect));
+    camera.aspect = aspect;
     camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(w, h);
 }
 
 function animate() {
