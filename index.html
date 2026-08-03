@@ -29,6 +29,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "918adf159b7840f18ebc4d56bc25d51a"}'></script>
   <script type="importmap">
   {
     "imports": {
@@ -43,6 +44,24 @@
     <div id="toolbar">
       <button id="btn-lang" onclick="switchLanguage()" title="Deutsch / English"></button>
       <button id="btn-theme" onclick="switchTheme()" title="Light / Dark"></button>
+    </div>
+
+    <div id="canvas-footer">
+      <div class="footer-inner">
+        <div id="version-text">
+          <span class="ver">dev</span>
+          <span class="ver-sep">·</span>
+          <button id="impressum-link" type="button" data-i18n="impressum" onclick="openImpressum()"></button>
+        </div>
+
+        <div id="controls-hint">
+          <span class="ctrl"><span class="ctrl-icon m">◧</span><span class="ctrl-icon t">↻</span><span data-i18n="rotate"></span></span>
+          <span class="sep">·</span>
+          <span class="ctrl"><span class="ctrl-icon m">◨</span><span class="ctrl-icon t">◉</span><span data-i18n="select"></span></span>
+          <span class="sep">·</span>
+          <span class="ctrl"><span class="ctrl-icon">◎</span><span data-i18n="zoom"></span></span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -89,25 +108,9 @@
     </div>
   </div>
 
-  <div id="controls-hint">
-    <span class="ctrl-icon">◧</span><span data-i18n="rotate"></span>
-    <span class="sep">·</span>
-    <span class="ctrl-icon">◨</span><span data-i18n="select"></span>
-    <span class="sep">·</span>
-    <span class="ctrl-icon">◎</span><span data-i18n="zoom"></span>
-  </div>
-
   <div class="info-popup" id="calc-popup" role="dialog" aria-label="Angle calculation">
     <div class="calc-header" id="calc-header"></div>
     <div class="formula" id="calc-formula"></div>
-  </div>
-
-  <script type="module" src="js/main.js"></script>
-
-  <div id="version-text">
-    <span class="ver">dev</span>
-    <span class="ver-sep">·</span>
-    <button id="impressum-link" type="button" data-i18n="impressum" onclick="openImpressum()"></button>
   </div>
 
   <div id="impressum-overlay" onclick="closeImpressumBackdrop(event)">
@@ -117,6 +120,8 @@
       <div id="impressum-body"></div>
     </div>
   </div>
+
+  <script type="module" src="js/main.js"></script>
 
 </body>
 </html>

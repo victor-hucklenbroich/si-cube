@@ -24,44 +24,73 @@ function fitFormula(el) {
     }
 }
 
+// Angle formula popover
+let formulaBtn, formulaPopup;
+
+export function closeFormulaPopover() {
+    if (!formulaPopup) return;
+    formulaPopup.classList.remove('open');
+    if (formulaBtn) formulaBtn.setAttribute('aria-expanded', 'false');
+}
+
 export function setupFormulaPopover() {
     const btn = document.querySelector('.info-btn');
     const popup = document.querySelector('.info-popup');
     if (!btn || !popup) return;
+    formulaBtn = btn;
+    formulaPopup = popup;
 
     const position = () => {
         const r = btn.getBoundingClientRect();
         const margin = 14;
+        const gap = 10;
         const w = popup.offsetWidth;
+        const h = popup.offsetHeight;
+
         let left = r.left + r.width / 2 - w / 2;
         left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+
+        // Prefer below the button, but flip above when it would be cut off
+        const roomBelow = window.innerHeight - r.bottom - gap - margin;
+        const roomAbove = r.top - gap - margin;
+        let top = (h <= roomBelow || roomBelow >= roomAbove)
+            ? r.bottom + gap
+            : r.top - gap - h;
+        top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
+
         popup.style.left = left + 'px';
-        popup.style.top = (r.bottom + 10) + 'px';
+        popup.style.top = top + 'px';
     };
 
     const open = () => {
+        // Only one popover at a time
+        closeAngleCalc();
         fitFormula(document.getElementById('formula'));
         position();
         popup.classList.add('open');
         btn.setAttribute('aria-expanded', 'true');
     };
-    const close = () => {
-        popup.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-    };
 
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        popup.classList.contains('open') ? close() : open();
+        popup.classList.contains('open') ? closeFormulaPopover() : open();
     });
     document.addEventListener('click', (e) => {
-        if (popup.classList.contains('open') && !popup.contains(e.target)) close();
+        if (popup.classList.contains('open') && !popup.contains(e.target)) closeFormulaPopover();
     });
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close();
+        if (e.key === 'Escape') closeFormulaPopover();
     });
     window.addEventListener('resize', () => {
         if (popup.classList.contains('open')) position();
+    });
+
+    const ro = new ResizeObserver(() => {
+        if (popup.classList.contains('open')) position();
+    });
+    ['#side-panel', '#angle-table'].forEach((sel) => {
+        const el = document.querySelector(sel);
+        if (el) ro.observe(el);
     });
 }
 
@@ -130,6 +159,7 @@ export function setupAngleCalcPopover() {
 
 export function showAngleCalc(anchor, headerHTML, ref, other) {
     if (!calcPopup || !window.katex) return;
+    closeFormulaPopover();
     calcHeaderEl.innerHTML = headerHTML;
     katex.render(buildAngleLatex(ref, other), calcFormulaEl, {throwOnError: false, displayMode: true});
     calcPopup.classList.add('open');

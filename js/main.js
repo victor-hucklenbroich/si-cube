@@ -3,8 +3,17 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 import {THEME_COLORS, PLANE_COLORS, REFERENCE_COLORS, DEFAULT_CAM} from './config.js';
 import {translations, getPreferredLanguage, applyTranslations} from './i18n.js';
-import {renderFormula, setupFormulaPopover, setupAngleCalcPopover, showAngleCalc, closeAngleCalc} from './formula.js';
+import {
+    renderFormula,
+    setupFormulaPopover,
+    setupAngleCalcPopover,
+    showAngleCalc,
+    closeAngleCalc,
+    closeFormulaPopover,
+} from './popover.js';
 
+
+const BASE_FOV = 40;
 
 const settings = {
     theme: getPreferredTheme(),
@@ -24,7 +33,13 @@ let referenceIdx = -1;
 const selectedFaces = new Set();
 const raycaster = new THREE.Raycaster();
 const mouseNDC = new THREE.Vector2();
-let rmbDownPos = null;
+
+// Gesture recognition
+const LONG_PRESS_MS = 500;
+const MOUSE_SLOP_SQ = 25;
+const TOUCH_SLOP_SQ = 144;
+let gesture = null;
+let inputTouch = false;
 
 
 async function init() {
@@ -40,7 +55,7 @@ async function init() {
 
     // Camera
     const container = document.getElementById('canvas-container');
-    camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera = new THREE.PerspectiveCamera(BASE_FOV, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(DEFAULT_CAM.x, DEFAULT_CAM.y, DEFAULT_CAM.z);
     camera.lookAt(0, 0, 0);
 
@@ -68,6 +83,8 @@ async function init() {
     // Lighting
     scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
+    setInputMode(window.matchMedia('(pointer: coarse)').matches);
+
     // Build
     buildCube(cubeData);
     updateReferenceFace();
@@ -77,9 +94,11 @@ async function init() {
     setupAngleCalcPopover();
 
     // Events
-    window.addEventListener('resize', onResize);
+    new ResizeObserver(onResize).observe(container);
     renderer.domElement.addEventListener('pointerdown', onPointerDown);
+    renderer.domElement.addEventListener('pointermove', onPointerMove);
     renderer.domElement.addEventListener('pointerup', onPointerUp);
+    renderer.domElement.addEventListener('pointercancel', endGesture);
     renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
@@ -355,23 +374,58 @@ function angleBetween(n1, n2) {
 }
 
 // Selection
+function setInputMode(touch) {
+    if (touch === inputTouch) return;
+    inputTouch = touch;
+    document.body.classList.toggle('input-touch', touch);
+    if (facesData.length) updateAngleList();
+}
+
+function endGesture() {
+    if (gesture && gesture.timer) clearTimeout(gesture.timer);
+    gesture = null;
+}
+
 function onPointerDown(e) {
-    if (e.button === 2) rmbDownPos = { x: e.clientX, y: e.clientY };
+    const touch = e.pointerType !== 'mouse';
+    setInputMode(touch);
+
+    if (gesture) { endGesture(); return; }
+
+    if (!touch && e.button !== 2) return;
+
+    gesture = {id: e.pointerId, x: e.clientX, y: e.clientY, touch, longPress: false, timer: null};
+
+    if (touch) {
+        gesture.timer = setTimeout(() => {
+            if (!gesture) return;
+            gesture.longPress = true;
+            navigator.vibrate?.(15);
+            selectAt(gesture.x, gesture.y, true);
+        }, LONG_PRESS_MS);
+    }
+}
+
+function onPointerMove(e) {
+    if (!gesture || gesture.id !== e.pointerId) return;
+    const dx = e.clientX - gesture.x;
+    const dy = e.clientY - gesture.y;
+
+    if (dx * dx + dy * dy > (gesture.touch ? TOUCH_SLOP_SQ : MOUSE_SLOP_SQ)) endGesture();
 }
 
 function onPointerUp(e) {
-    if (e.button !== 2 || !rmbDownPos) return;
-    const dx = e.clientX - rmbDownPos.x;
-    const dy = e.clientY - rmbDownPos.y;
-    rmbDownPos = null;
-    if (dx * dx + dy * dy > 25) return;
-    handleSelectClick(e);
+    if (!gesture || gesture.id !== e.pointerId) return;
+    const g = gesture;
+    endGesture();
+    if (g.longPress) return;  // already handled when the timer fired
+    selectAt(e.clientX, e.clientY, !g.touch && e.shiftKey);
 }
 
-function handleSelectClick(e) {
+function selectAt(clientX, clientY, wholeFamily) {
     const rect = renderer.domElement.getBoundingClientRect();
-    mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    mouseNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    mouseNDC.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouseNDC, camera);
     const meshes = faceMeshes.map(f => f.mesh);
@@ -385,7 +439,7 @@ function handleSelectClick(e) {
     const idx = faceMeshes.findIndex(f => f.mesh === hits[0].object);
     if (idx < 0) return;
 
-    if (e.shiftKey) toggleFamily(idx);
+    if (wholeFamily) toggleFamily(idx);
     else toggleFace(idx);
 
     rebuildFaceTextures();
@@ -465,13 +519,14 @@ function updateAngleList() {
 
     const selected = Array.from(selectedFaces);
 
-    // The selection changed, so any open calculation popover is now outdated
+    // The selection changed, so any open popover is now stale
     closeAngleCalc();
+    closeFormulaPopover();
 
     if (clearBtn) clearBtn.style.visibility = selected.length > 0 ? 'visible' : 'hidden';
 
     if (selected.length === 0) {
-        listEl.innerHTML = `<div class="hint-msg">${t.hint_empty}</div>`;
+        listEl.innerHTML = `<div class="hint-msg">${inputTouch ? t.hint_empty_touch : t.hint_empty}</div>`;
         return;
     }
 
@@ -502,9 +557,18 @@ function updateAngleList() {
 
 function onResize() {
     const container = document.getElementById('canvas-container');
-    camera.aspect = container.clientWidth / container.clientHeight;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    if (w === 0 || h === 0) return;
+
+    const aspect = w / h;
+    camera.fov = aspect >= 1
+        ? BASE_FOV
+        : THREE.MathUtils.radToDeg(
+            2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(BASE_FOV) / 2) / aspect));
+    camera.aspect = aspect;
     camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(w, h);
 }
 
 function animate() {
