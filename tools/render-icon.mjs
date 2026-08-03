@@ -1,13 +1,15 @@
-// Generates assets/favicon.svg by projecting the real cube geometry
+// Generates the favicon set by projecting the real cube geometry
 // (data/cube.json) through the same camera the live renderer uses, so the icon
 // shows the cube from the app's default viewing angle.
 //
-//   node tools/render-icon.mjs
+//   npm install && node tools/render-icon.mjs
 
 
 import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {dirname, join} from 'node:path';
+import {Resvg} from '@resvg/resvg-js';
+import pngToIco from 'png-to-ico';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const cube = JSON.parse(readFileSync(join(root, 'data/cube.json'), 'utf8'));
@@ -90,6 +92,21 @@ ${paths}
 </svg>
 `;
 
-mkdirSync(join(root, 'assets'), {recursive: true});
-writeFileSync(join(root, 'assets/favicon.svg'), svg);
-console.log('Generated assets/favicon.svg');
+// --- Output ---
+const outDirs = [join(root, 'assets'), join(root, '_site/assets')];
+for (const dir of outDirs) mkdirSync(dir, {recursive: true});
+
+function emit(name, data) {
+    for (const dir of outDirs) writeFileSync(join(dir, name), data);
+    console.log(`Generated ${name}`);
+}
+
+const raster = (px) => Buffer.from(
+    new Resvg(svg, {fitTo: {mode: 'width', value: px}}).render().asPng()
+);
+
+emit('favicon.svg', svg);
+for (const [name, px] of [['favicon-32.png', 32], ['apple-touch-icon.png', 180]]) {
+    emit(name, raster(px));
+}
+emit('favicon.ico', await pngToIco([16, 32, 48].map(raster)));

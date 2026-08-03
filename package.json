@@ -1,0 +1,14 @@
+{
+  "name": "si-cube",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Build tooling for the Silicon Cube web app. The app itself is static and has no runtime dependencies.",
+  "license": "MIT",
+  "scripts": {
+    "icons": "node tools/render-icon.mjs"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "png-to-ico": "^2.1.8"
+  }
+}
