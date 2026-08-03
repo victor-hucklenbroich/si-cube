@@ -51,7 +51,13 @@ body {
 }
 
 #canvas-container { flex: 1; position: relative; min-width: 0; }
-canvas { display: block; }
+canvas {
+  display: block;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 #toolbar {
   position: absolute;
@@ -417,6 +423,9 @@ canvas { display: block; }
   white-space: nowrap;
 }
 #controls-hint .ctrl-icon { color: var(--text); font-weight: 500; }
+#controls-hint .ctrl-icon.t { display: none; }
+body.input-touch #controls-hint .ctrl-icon.m { display: none; }
+body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
 #controls-hint [data-i18n] { color: var(--text); font-weight: 500; }
 #controls-hint .sep { color: var(--text-dim); opacity: 0.6; font-weight: 400; margin: 0 2px; }
 
