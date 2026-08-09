@@ -1,11 +1,10 @@
-# Silicon Cube <img src="./assets/apple-touch-icon.png" alt="drawing" width="35"/>
+# Silicon Cube (TUM MW0080) <img src="./assets/apple-touch-icon.png" alt="drawing" width="35"/>
 
 ![GitHub release(latest by date)](https://img.shields.io/github/v/release/victor-hucklenbroich/si-cube)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-brightgreen?logo=github)](https://victor-hucklenbroich.github.io/si-cube/)
 
 Compact web app to accompany the TUM lecture MW0080 Microsensor & Actuators (Mikrotechnische Sensoren und Aktoren). 
-Intended to make the lectures Silicon cube more accessible and help with the visualization and calculation of Miller indices and crystal plane angles.
-
-**App available at:** https://victor-hucklenbroich.github.io/si-cube/
+Intended to make the lectures Silicon cube more accessible and help with visualization and calculation of Miller indices and crystal plane angles.
 
 <p align="center">
   <picture>

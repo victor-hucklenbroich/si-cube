@@ -2,7 +2,7 @@
 export const translations = {
     de: {
         page: "Silizium Würfel · TUM MW0080",
-        title: "Si Kristallebenen",
+        title: "Silizium Würfel",
         subtitle: "Millersche Indizes",
         angles: "WINKEL",
         rotate: "Drehen",
@@ -26,7 +26,7 @@ export const translations = {
     },
     en: {
         page: "Silicon Cube · TUM MW0080",
-        title: "Si Crystal Planes",
+        title: "Silicon Cube",
         subtitle: "Miller Indices",
         angles: "ANGLES",
         rotate: "Rotate",
