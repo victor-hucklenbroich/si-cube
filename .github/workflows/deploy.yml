@@ -1,9 +1,13 @@
 name: Deploy to GitHub Pages
 
-# Deploys the tagged commit of a published release
+# Deploys the tagged commit of a published release and a development
+# version of the latest dev branch commit
+
 on:
   release:
     types: [published]
+  push:
+    branches: [dev]
   workflow_dispatch:
 
 permissions:
@@ -27,40 +31,66 @@ jobs:
         run: |
           tag="$EVENT_TAG"
           if [ -z "$tag" ]; then
-            tag="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName)" \
-              || { echo "::error::No release found to deploy."; exit 1; }
-            echo "Manual run — deploying latest release: $tag"
+            if tag="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName)"; then
+              echo "Deploying latest release: $tag"
+            else
+              echo "::warning::No release found: deploying /dev only, site root stays empty."
+              tag=""
+            fi
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
+      - name: Check out release
+        if: steps.release.outputs.tag != ''
+        uses: actions/checkout@v4
         with:
           ref: ${{ steps.release.outputs.tag }}
+          path: src-release
+
+      - name: Check out dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          path: src-dev
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: '**/package-lock.json'
 
-      - run: npm ci
-
-      - name: Stage site
+      - name: Build site
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: |
+          set -euo pipefail
+
+          build() {
+            local src="$1" out="$2" version="$3"
+            ( cd "$src" && npm ci && node tools/render-icon.mjs )
+            mkdir -p "$out"
+            rsync -a \
+              --exclude='.git' --exclude='.github' --exclude='.idea' \
+              --exclude='node_modules' --exclude='_site' --exclude='tools' \
+              --exclude='package.json' --exclude='package-lock.json' \
+              --exclude='README.md' --exclude='LICENSE' \
+              --exclude='.gitignore' --exclude='.DS_Store' \
+              --exclude='docs' \
+              "$src"/ "$out"/
+            node "$src/tools/set-version.mjs" "$out/index.html" "$version"
+          }
+
           mkdir -p _site
-          rsync -a \
-            --exclude='.git' --exclude='.github' --exclude='.idea' \
-            --exclude='node_modules' --exclude='_site' --exclude='tools' \
-            --exclude='package.json' --exclude='package-lock.json' \
-            --exclude='README.md' --exclude='LICENSE' \
-            --exclude='.gitignore' --exclude='.DS_Store' \
-            --exclude='docs' \
-            ./ _site/
 
-      - name: Render icons
-        run: node tools/render-icon.mjs
+          if [ -n "$RELEASE_TAG" ]; then
+            build src-release _site "$RELEASE_TAG"
+          fi
 
-      - name: Stamp release version
-        run: node tools/set-version.mjs _site/index.html "${{ steps.release.outputs.tag }}"
+          dev_sha="$(git -C src-dev rev-parse --short HEAD)"
+          build src-dev _site/dev "dev-$dev_sha"
+
+          sed -i 's|</head>|  <meta name="robots" content="noindex">\n</head>|' _site/dev/index.html
+          sed -i '/cloudflareinsights/d' _site/dev/index.html
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
