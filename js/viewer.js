@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
-import {CAMERA} from './config.js';
+import {CAMERA, CONTROLS} from './config.js';
 import {themeColors} from './theme.js';
 
 export function createViewer(container) {
@@ -66,8 +66,8 @@ function createControls(camera, domElement) {
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.rotateSpeed = 0.6;
-    controls.minDistance = CAMERA.minDistance;
-    controls.maxDistance = CAMERA.maxDistance;
+    controls.minDistance = CONTROLS.minDistance;
+    controls.maxDistance = CONTROLS.maxDistance;
     controls.target.set(0, 0, 0);
     controls.enablePan = false;
     controls.mouseButtons = {

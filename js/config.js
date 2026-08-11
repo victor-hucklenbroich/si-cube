@@ -30,6 +30,9 @@ export const CAMERA = {
     near: 0.1,
     far: 100,
     position: {x: 3.8, y: 2.5, z: 3.8},
+};
+
+export const CONTROLS = {
     minDistance: 6,
     maxDistance: 25,
 };

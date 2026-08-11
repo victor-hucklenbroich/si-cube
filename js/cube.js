@@ -8,6 +8,8 @@ const TRIANGLE_FAMILY = '111';
 const UV_PADDING = 0.02;
 const GLOW = {base: 0.15, amplitude: 0.33, speed: 0.004};
 
+const PLAIN = 0, SELECTED = 1, REFERENCE = 2, UNPAINTED = -1;
+
 export function buildCube(data) {
     const faces = data.faces.map((face, index) => createFace(face, data.vertices, index));
     const edgeLines = createEdgeLines(data);
@@ -16,23 +18,22 @@ export function buildCube(data) {
     faces.forEach((face) => group.add(face.mesh));
     group.add(edgeLines);
 
+    const painted = faces.map(() => PLAIN);
+
     function refreshTextures(selection) {
         const referenceIdx = selection.referenceIndex();
         faces.forEach((face, idx) => {
-            const reference = idx === referenceIdx;
-            const material = face.mesh.material;
-            material.map?.dispose();
-            material.map = createFaceTexture(face, {selected: selection.has(idx), reference});
-            if (!reference) {
-                material.emissive.setHex(0x000000);
-                material.emissiveIntensity = 1;
-            }
-            material.needsUpdate = true;
+            const appearance = idx === referenceIdx ? REFERENCE
+                : selection.has(idx) ? SELECTED : PLAIN;
+            if (painted[idx] === appearance) return;
+            paintFace(face, appearance);
+            painted[idx] = appearance;
         });
     }
 
     function applyTheme(selection) {
         edgeLines.material.color.set(themeColors().edgeColor);
+        painted.fill(UNPAINTED);  // every texture draws in theme colors
         refreshTextures(selection);
     }
 
@@ -60,7 +61,7 @@ function createFace(face, vertices, index) {
         textCenter: centroid,
     };
 
-    record.mesh = new THREE.Mesh(
+    const mesh = new THREE.Mesh(
         createFaceGeometry(face, vertices, uvByVertex),
         new THREE.MeshPhongMaterial({
             map: createFaceTexture(record),
@@ -68,8 +69,22 @@ function createFace(face, vertices, index) {
             side: THREE.DoubleSide,
         }),
     );
-    record.mesh.userData.faceIndex = index;
-    return record;
+    mesh.userData.faceIndex = index;
+    return {...record, mesh};
+}
+
+function paintFace(face, appearance) {
+    const material = face.mesh.material;
+    material.map?.dispose();
+    material.map = createFaceTexture(face, {
+        selected: appearance === SELECTED,
+        reference: appearance === REFERENCE,
+    });
+    if (appearance !== REFERENCE) {
+        material.emissive.setHex(0x000000);
+        material.emissiveIntensity = 1;
+    }
+    material.needsUpdate = true;
 }
 
 function createFaceGeometry(face, vertices, uvByVertex) {
