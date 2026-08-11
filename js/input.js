@@ -32,14 +32,12 @@ export function createInput(element, {onSelect, onModeChange}) {
 
         gesture = {id: e.pointerId, x: e.clientX, y: e.clientY, touch, longPress: false, timer: null};
 
-        if (touch) {
-            gesture.timer = setTimeout(() => {
-                if (!gesture) return;
-                gesture.longPress = true;
-                navigator.vibrate?.(15);
-                onSelect(gesture.x, gesture.y, true);
-            }, LONG_PRESS_MS);
-        }
+        gesture.timer = setTimeout(() => {
+            if (!gesture) return;
+            gesture.longPress = true;
+            if (touch) navigator.vibrate?.(15);
+            onSelect(gesture.x, gesture.y, true);
+        }, LONG_PRESS_MS);
     }
 
     function onPointerMove(e) {
