@@ -1,9 +1,7 @@
 import {t} from './i18n.js';
-import {isTouchInput} from './input.js';
 import {angleBetween, formatMillerIndexHTML} from './miller.js';
-import {closeAngleCalc, closeFormulaPopover, showAngleCalc} from './popover.js';
 
-export function createHud(faces, selection) {
+export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBeforeRender}) {
     const referenceEl = document.getElementById('current-face');
     const referenceLabelEl = document.getElementById('face-label');
     const referenceIndexEl = document.getElementById('facing-index');
@@ -64,10 +62,7 @@ export function createHud(faces, selection) {
     }
 
     function render() {
-        // The selection changed, so any open popover is now stale
-        closeAngleCalc();
-        closeFormulaPopover();
-
+        onBeforeRender?.();
         renderReference();
         renderAngles();
     }

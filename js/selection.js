@@ -1,4 +1,4 @@
-export function createSelection() {
+export function createSelection(faces) {
     const selected = new Set();
 
     const has = (idx) => selected.has(idx);
@@ -11,7 +11,7 @@ export function createSelection() {
         else selected.add(idx);
     }
 
-    function toggleFamily(faces, clickedIdx) {
+    function toggleFamily(clickedIdx) {
         const family = faces[clickedIdx].family;
         const ids = faces.reduce((acc, face, i) => {
             if (face.family === family) acc.push(i);

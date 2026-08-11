@@ -2,26 +2,18 @@ const LONG_PRESS_MS = 500;
 const MOUSE_SLOP_SQ = 25;
 const TOUCH_SLOP_SQ = 144;
 
-const listeners = new Set();
-let touchInput = false;
-
-export function isTouchInput() {
-    return touchInput;
-}
-
-export function onInputModeChange(fn) {
-    listeners.add(fn);
-}
-
-function setInputMode(touch) {
-    if (touch === touchInput) return;
-    touchInput = touch;
-    document.body.classList.toggle('input-touch', touch);
-    listeners.forEach((fn) => fn(touch));
-}
-
-export function attachInput(element, {onSelect}) {
+export function createInput(element, {onSelect, onModeChange}) {
+    let touchInput = window.matchMedia('(pointer: coarse)').matches;
     let gesture = null;
+
+    document.body.classList.toggle('input-touch', touchInput);
+
+    function setInputMode(touch) {
+        if (touch === touchInput) return;
+        touchInput = touch;
+        document.body.classList.toggle('input-touch', touch);
+        onModeChange?.();
+    }
 
     function endGesture() {
         if (gesture?.timer) clearTimeout(gesture.timer);
@@ -65,11 +57,11 @@ export function attachInput(element, {onSelect}) {
         onSelect(e.clientX, e.clientY, !touch && e.shiftKey);
     }
 
-    setInputMode(window.matchMedia('(pointer: coarse)').matches);
-
     element.addEventListener('pointerdown', onPointerDown);
     element.addEventListener('pointermove', onPointerMove);
     element.addEventListener('pointerup', onPointerUp);
     element.addEventListener('pointercancel', endGesture);
     element.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    return {isTouchInput: () => touchInput};
 }

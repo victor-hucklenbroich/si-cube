@@ -2,8 +2,8 @@ import {buildCube} from './cube.js';
 import {createHud} from './hud.js';
 import {applyLanguage, onLanguageChange, toggleLanguage} from './i18n.js';
 import {createImpressum} from './impressum.js';
-import {attachInput, onInputModeChange} from './input.js';
-import {renderFormula, setupAngleCalcPopover, setupFormulaPopover} from './popover.js';
+import {createInput} from './input.js';
+import {createPopovers} from './popover.js';
 import {createSelection} from './selection.js';
 import {applyTheme, onThemeChange, toggleTheme} from './theme.js';
 import {createViewer} from './viewer.js';
@@ -16,10 +16,34 @@ async function init() {
 
     const viewer = createViewer(document.getElementById('canvas-container'));
     const cube = buildCube(data);
-    const selection = createSelection();
-    const hud = createHud(cube.faces, selection);
+    const selection = createSelection(cube.faces);
+    const popovers = createPopovers();
     const impressum = createImpressum();
     viewer.add(cube.group);
+
+    const faceMeshes = cube.faces.map((face) => face.mesh);
+
+    const input = createInput(viewer.canvas, {
+        onSelect(clientX, clientY, wholeFamily) {
+            const hit = viewer.pick(clientX, clientY, faceMeshes);
+            if (!hit) {
+                clearSelection();
+                return;
+            }
+            const idx = hit.userData.faceIndex;
+            if (wholeFamily) selection.toggleFamily(idx);
+            else selection.toggleFace(idx);
+            selectionChanged();
+        },
+        onModeChange: () => hud.render(),
+    });
+
+    const hud = createHud(cube.faces, selection, {
+        isTouchInput: input.isTouchInput,
+        showAngleCalc: popovers.showAngleCalc,
+        // Whatever the HUD is about to redraw for, any open popover is now stale
+        onBeforeRender: popovers.closeAll,
+    });
 
     function selectionChanged() {
         cube.refreshTextures(selection);
@@ -32,23 +56,6 @@ async function init() {
         selectionChanged();
     }
 
-    const faceMeshes = cube.faces.map((face) => face.mesh);
-
-    attachInput(viewer.canvas, {
-        onSelect(clientX, clientY, wholeFamily) {
-            const hit = viewer.pick(clientX, clientY, faceMeshes);
-            if (!hit) {
-                clearSelection();
-                return;
-            }
-            const idx = hit.userData.faceIndex;
-            if (wholeFamily) selection.toggleFamily(cube.faces, idx);
-            else selection.toggleFace(idx);
-            selectionChanged();
-        },
-    });
-
-    onInputModeChange(() => hud.render());
     onLanguageChange(() => hud.render());
     onThemeChange(() => {
         viewer.applyTheme();
@@ -65,10 +72,6 @@ async function init() {
     });
 
     hud.render();
-    renderFormula();
-    setupFormulaPopover();
-    setupAngleCalcPopover();
-
     viewer.start(() => cube.pulseReference(selection));
 }
 
