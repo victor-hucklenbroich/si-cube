@@ -50,20 +50,40 @@ export const translations = {
     },
 };
 
-export function getPreferredLanguage() {
-    const saved = localStorage.getItem('lang');
-    if (saved) return saved;
+const STORAGE_KEY = 'lang';
+
+const listeners = new Set();
+let current = preferredLanguage();
+
+function preferredLanguage() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved in translations) return saved;
     return navigator.language.startsWith('de') ? 'de' : 'en';
 }
 
-export function applyTranslations(lang) {
-    localStorage.setItem('lang', lang);
+export function t() {
+    return translations[current];
+}
+
+export function applyLanguage(lang = current) {
+    current = lang;
+    localStorage.setItem(STORAGE_KEY, lang);
 
     document.querySelectorAll('[data-i18n]').forEach((el) => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) el.textContent = translations[lang][key];
+        const text = translations[lang][el.getAttribute('data-i18n')];
+        if (text) el.textContent = text;
     });
 
     const btn = document.getElementById('btn-lang');
-    if (btn) btn.textContent = lang === 'de' ? 'DE' : 'EN';
+    if (btn) btn.textContent = lang.toUpperCase();
+
+    listeners.forEach((fn) => fn(lang));
+}
+
+export function toggleLanguage() {
+    applyLanguage(current === 'de' ? 'en' : 'de');
+}
+
+export function onLanguageChange(fn) {
+    listeners.add(fn);
 }

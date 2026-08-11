@@ -25,4 +25,11 @@ export const REFERENCE_COLORS = {
     light: '#eb3054',
 };
 
-export const DEFAULT_CAM = {x: 3.8, y: 2.5, z: 3.8};
+export const CAMERA = {
+    fov: 40,
+    near: 0.1,
+    far: 100,
+    position: {x: 3.8, y: 2.5, z: 3.8},
+    minDistance: 6,
+    maxDistance: 25,
+};
