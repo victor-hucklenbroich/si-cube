@@ -54,7 +54,7 @@ export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBefo
             .map((idx) => ({
                 idx,
                 face: faces[idx],
-                angle: angleBetween(faces[refIdx].normal, faces[idx].normal),
+                angle: angleBetween(faces[refIdx].label, faces[idx].label),
             }))
             .sort((a, b) => a.angle - b.angle)
             .map(angleRowHTML)

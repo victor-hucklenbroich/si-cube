@@ -57,7 +57,6 @@ function createFace(face, vertices, index) {
         label: face.label,
         family: face.family,
         isTriangle: face.family === TRIANGLE_FAMILY,
-        normal: new THREE.Vector3(...face.normal),
         textCenter: centroid,
     };
 
