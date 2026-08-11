@@ -1,4 +1,4 @@
-const LONG_PRESS_MS = 500;
+const LONG_PRESS_MS = 350;
 const MOUSE_SLOP_SQ = 25;
 const TOUCH_SLOP_SQ = 144;
 
