@@ -98,7 +98,11 @@ canvas {
 #btn-tutorial { font-size: 15px; }
 
 #side-panel {
-  width: 300px;
+  --panel-h: 100dvh;
+  --space-scale: clamp(0.6px, var(--panel-h) * 0.00105 + 0.263px, 1px);
+  --type-scale: clamp(0.85px, var(--panel-h) * 0.000395 + 0.724px, 1px);
+
+  width: clamp(260px, 30vw, 300px);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -109,7 +113,7 @@ canvas {
 }
 
 #panel-header {
-  padding: 18px 18px 14px;
+  padding: calc(18 * var(--space-scale)) 18px calc(14 * var(--space-scale));
   display: flex;
   align-items: center;
   gap: 12px;
@@ -117,8 +121,8 @@ canvas {
 
 .element-tile {
   flex: none;
-  width: 46px;
-  height: 46px;
+  width: calc(46 * var(--type-scale));
+  height: calc(46 * var(--type-scale));
   padding: 4px 5px;
   box-sizing: border-box;
   display: flex;
@@ -134,18 +138,18 @@ canvas {
 }
 .element-tile .el-num {
   align-self: flex-start;
-  font-size: 8.5px;
+  font-size: calc(8.5 * var(--type-scale));
   font-weight: 500;
   color: var(--text-dim);
 }
 .element-tile .el-sym {
-  font-size: 20px;
+  font-size: calc(20 * var(--type-scale));
   font-weight: 500;
   color: var(--text-bright);
   letter-spacing: 0.02em;
 }
 .element-tile .el-mass {
-  font-size: 7.5px;
+  font-size: calc(7.5 * var(--type-scale));
   font-weight: 400;
   color: var(--text-dim);
   letter-spacing: 0.02em;
@@ -153,26 +157,30 @@ canvas {
 
 #panel-header h1 {
   font-family: var(--mono);
-  font-size: 16px;
+  font-size: calc(16 * var(--type-scale));
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--text-bright);
 }
-#panel-header .subtitle { font-size: 13px; color: var(--text-dim); margin-top: 3px; }
+#panel-header .subtitle {
+  font-size: calc(13 * var(--type-scale));
+  color: var(--text-dim);
+  margin-top: 3px;
+}
 
 .hud-label {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: calc(11 * var(--type-scale));
   font-weight: 500;
   letter-spacing: 0.12em;
   color: var(--text-dim);
-  margin-bottom: 8px;
+  margin-bottom: calc(8 * var(--space-scale));
   text-transform: uppercase;
 }
 
 #current-face {
   margin: 0 12px;
-  padding: 14px 16px;
+  padding: calc(14 * var(--space-scale)) 16px;
   background: var(--surface-hover);
   border: 1px solid var(--surface-border);
   border-radius: 10px;
@@ -180,7 +188,7 @@ canvas {
 
 .miller-big {
   font-family: var(--mono);
-  font-size: 30px;
+  font-size: calc(30 * var(--type-scale));
   font-weight: 300;
   color: var(--text-bright);
   letter-spacing: 0.04em;
@@ -190,7 +198,7 @@ canvas {
 .family-tag {
   display: inline-block;
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: calc(13 * var(--type-scale));
   font-weight: 500;
   padding: 3px 8px;
   border-radius: 4px;
@@ -201,8 +209,8 @@ canvas {
 .family-111 { background: color-mix(in srgb, var(--accent-111) 16%, transparent); color: var(--accent-111); border: 1px solid color-mix(in srgb, var(--accent-111) 38%, transparent); }
 
 #angle-table {
-  margin: 10px 12px 0;
-  padding: 10px 0;
+  margin: calc(10 * var(--space-scale)) 12px 0;
+  padding: calc(10 * var(--space-scale)) 0;
   background: var(--surface-hover);
   border: 1px solid var(--surface-border);
   border-radius: 10px;
@@ -218,7 +226,7 @@ canvas {
   align-items: center;
   justify-content: space-between;
   padding: 0 14px;
-  margin-bottom: 6px;
+  margin-bottom: calc(6 * var(--space-scale));
 }
 .angle-header .hud-label { margin-bottom: 0; }
 
@@ -437,14 +445,20 @@ canvas {
 .group-rows .angle-row { padding-left: 10px; }
 
 #panel-footer {
-  padding: 10px 14px 14px;
+  padding: calc(10 * var(--space-scale)) 14px calc(14 * var(--space-scale));
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 #legend { display: flex; gap: 12px; }
-.legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-dim); }
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: calc(12 * var(--type-scale));
+  color: var(--text-dim);
+}
 .legend-item span:first-child { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 .legend-item .fam { font-family: var(--mono); }
 .swatch-100 { background: var(--accent-100); }
@@ -744,6 +758,9 @@ body.tutorial-open #calc-popup { z-index: 160; }
   }
 
   #side-panel {
+    /* Stacked under the viewer */
+    --panel-h: 52dvh;
+
     width: 100%;
     height: auto;
     flex: 0 0 auto;
@@ -755,22 +772,7 @@ body.tutorial-open #calc-popup { z-index: 160; }
 
   .footer-inner { padding-bottom: 14px; }
 
-  #panel-header { padding: 12px 16px 10px; gap: 10px; }
-  #panel-header h1 { font-size: 15px; }
-  #panel-header .subtitle { font-size: 12px; }
+  .element-tile { padding: 3px 4px; border-radius: 6px; }
 
-  .element-tile { width: 40px; height: 40px; padding: 3px 4px; border-radius: 6px; }
-  .element-tile .el-sym { font-size: 17px; }
-  .element-tile .el-num { font-size: 8px; }
-  .element-tile .el-mass { font-size: 7px; }
-
-  #current-face { padding: 10px 14px; }
-  .miller-big { font-size: 26px; }
-
-  #angle-table {
-    flex: 0 1 auto;
-    margin-top: 8px;
-  }
-
-  #panel-footer { padding: 8px 14px 10px; }
+  #angle-table { flex: 0 1 auto; }
 }
