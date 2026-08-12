@@ -27,9 +27,14 @@ export function createSelection(faces) {
         ids.forEach((i) => selected.add(i));
     }
 
+    function set(indices) {
+        selected.clear();
+        indices.forEach((idx) => selected.add(idx));
+    }
+
     function clear() {
         selected.clear();
     }
 
-    return {has, indices, isEmpty, referenceIndex, toggleFace, toggleFamily, clear};
+    return {has, indices, isEmpty, referenceIndex, toggleFace, toggleFamily, set, clear};
 }

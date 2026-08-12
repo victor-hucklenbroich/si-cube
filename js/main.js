@@ -6,6 +6,7 @@ import {createInput} from './input.js';
 import {createPopovers} from './popover.js';
 import {createSelection} from './selection.js';
 import {applyTheme, onThemeChange, toggleTheme} from './theme.js';
+import {createTutorial} from './tutorial.js';
 import {createViewer} from './viewer.js';
 
 async function init() {
@@ -43,6 +44,21 @@ async function init() {
         showAngleCalc: popovers.showAngleCalc,
         // Whatever the HUD is about to redraw for, any open popover is now stale
         onBeforeRender: popovers.closeAll,
+        startTutorial: () => tutorial.start(),
+    });
+
+    const tutorial = createTutorial({
+        isTouchInput: input.isTouchInput,
+        planes: selection.indices,
+        select(indices, wholeFamilyOf) {
+            selection.set(indices);
+            if (wholeFamilyOf !== undefined) selection.toggleFamily(wholeFamilyOf);
+            selectionChanged();
+        },
+        openCalc: hud.openCalcFor,
+        closePopups: popovers.closeAll,
+        orbitTo: viewer.orbitTo,
+        cameraPose: viewer.cameraPose,
     });
 
     function selectionChanged() {
@@ -64,15 +80,21 @@ async function init() {
 
     document.getElementById('btn-lang').addEventListener('click', toggleLanguage);
     document.getElementById('btn-theme').addEventListener('click', toggleTheme);
+    document.getElementById('btn-tutorial').addEventListener('click', () => {
+        if (tutorial.isOpen()) tutorial.stop();
+        else tutorial.start();
+    });
     document.getElementById('clear-btn').addEventListener('click', clearSelection);
     window.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
         if (legal.isOpen()) legal.close();
+        else if (tutorial.isOpen()) tutorial.stop();
         else clearSelection();
     });
 
     hud.render();
     viewer.start(() => cube.pulseReference(selection));
+    tutorial.startOnFirstVisit();
 }
 
 init().catch(console.error);

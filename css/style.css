@@ -20,6 +20,7 @@ body, body[data-theme="dark"] {
   --edge-color: #cbd5e1;
   --face-bg-mix: 60;
   --face-text-alpha: 1.0;
+  --tutorial-dim: rgba(4, 6, 10, 0.55);
 }
 
 body[data-theme="light"] {
@@ -37,6 +38,7 @@ body[data-theme="light"] {
   --edge-color: #475569;
   --face-bg-mix: 210;
   --face-text-alpha: 0.9;
+  --tutorial-dim: rgba(15, 23, 42, 0.32);
 }
 
 body {
@@ -93,6 +95,7 @@ canvas {
 }
 
 #btn-theme { font-size: 17px; }
+#btn-tutorial { font-size: 15px; }
 
 #side-panel {
   width: 300px;
@@ -366,6 +369,22 @@ canvas {
   color: var(--text-dim);
 }
 
+.hint-tutorial {
+  display: block;
+  margin-top: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent-100);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.hint-tutorial:hover { color: var(--text-bright); }
+
 .angle-row {
   display: flex;
   align-items: center;
@@ -457,61 +476,13 @@ canvas {
 }
 
 .footer-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: end;
-  gap: 8px 12px;
   padding: 0 16px 14px;
   padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   padding-left: calc(16px + env(safe-area-inset-left, 0px));
   padding-right: calc(16px + env(safe-area-inset-right, 0px));
 }
-
-#version-text { grid-area: 1 / 1; justify-self: start; }
-#controls-hint { grid-area: 1 / 2; justify-self: center; }
-
-@container (max-width: 560px) {
-  .footer-inner {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
-    gap: 8px;
-  }
-  #controls-hint { grid-area: 1 / 1; }
-  #version-text { grid-area: 2 / 1; }
-}
-
-#controls-hint {
-  max-width: 100%;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-size: clamp(11px, 0.83cqi + 8px, 13px);
-  color: var(--text-dim);
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 6px 14px;
-  padding: clamp(4px, 0.83cqi + 1px, 6px) clamp(10px, 1.67cqi + 4px, 14px);
-  border-radius: 7px;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2px 5px;
-}
-#controls-hint .ctrl {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  white-space: nowrap;
-}
-#controls-hint .ctrl-icon { color: var(--text); font-weight: 500; }
-#controls-hint .ctrl-icon.t { display: none; }
-body.input-touch #controls-hint .ctrl-icon.m { display: none; }
-body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
-#controls-hint [data-i18n] { color: var(--text); font-weight: 500; }
-#controls-hint .sep { color: var(--text-dim); opacity: 0.6; font-weight: 400; margin: 0 2px; }
 
 #version-text {
   max-width: 100%;
@@ -644,6 +615,136 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
 
 /* The privacy policy is far longer than the imprint, so give it more room. */
 #legal-overlay.doc-privacy #legal-modal { width: min(560px, 100%); }
+
+/* Interactive tutorial */
+#tutorial-dim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 150;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 22%, transparent),
+              0 0 0 100vmax var(--tutorial-dim);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s,
+              top 0.28s, left 0.28s, width 0.28s, height 0.28s;
+}
+#tutorial-dim.open { opacity: 1; visibility: visible; }
+
+#tutorial-dim:not(.open) { transition: opacity 0.2s, visibility 0.2s; }
+#tutorial-card:not(.open) { transition: opacity 0.18s, visibility 0.18s, transform 0.18s; }
+
+body.tutorial-open #calc-popup { z-index: 160; }
+
+#tutorial-card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 170;
+  width: min(340px, calc(100vw - 28px));
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.18s, visibility 0.18s, transform 0.18s, top 0.28s, left 0.28s;
+}
+#tutorial-card.open { opacity: 1; visibility: visible; transform: translateY(0); }
+
+#tutorial-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+#tutorial-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--text-dim);
+  opacity: 0.4;
+  transition: width 0.2s, opacity 0.2s, background 0.2s;
+}
+#tutorial-dots span.on {
+  width: 16px;
+  opacity: 1;
+  background: var(--accent-100);
+}
+
+#tutorial-title {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+}
+
+#tutorial-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+#tutorial-body kbd {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--surface-hover);
+  border: 1px solid var(--surface-border);
+  color: var(--text-bright);
+  white-space: nowrap;
+}
+
+.tutorial-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.tutorial-nav {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.tutorial-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--surface-border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.tutorial-btn:hover {
+  color: var(--text-bright);
+  background: var(--surface-hover);
+  border-color: var(--text-dim);
+}
+
+.tutorial-ghost { border-color: transparent; padding-left: 2px; }
+.tutorial-ghost:hover { background: transparent; border-color: transparent; }
+
+.tutorial-primary {
+  color: var(--text-bright);
+  border-color: color-mix(in srgb, var(--accent-100) 45%, transparent);
+  background: color-mix(in srgb, var(--accent-100) 16%, transparent);
+}
+.tutorial-primary:hover {
+  background: color-mix(in srgb, var(--accent-100) 26%, transparent);
+  border-color: var(--accent-100);
+}
 
 #angle-list::-webkit-scrollbar { width: 4px; }
 #angle-list::-webkit-scrollbar-track { background: transparent; }

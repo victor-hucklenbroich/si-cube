@@ -4,6 +4,8 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {CAMERA, CONTROLS} from './config.js';
 import {themeColors} from './theme.js';
 
+const ORBIT_MS = 700;
+
 export function createViewer(container) {
     const scene = new THREE.Scene();
     scene.add(new THREE.AmbientLight(0xffffff, 1.0));
@@ -21,6 +23,9 @@ export function createViewer(container) {
     const controls = createControls(camera, renderer.domElement);
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
+    const spherical = new THREE.Spherical();
+
+    let orbit = null;
 
     function resize() {
         const width = container.clientWidth;
@@ -47,8 +52,33 @@ export function createViewer(container) {
         scene.background = new THREE.Color(themeColors().sceneBg);
     }
 
+    function orbitTo(position, duration = ORBIT_MS) {
+        const from = sphericalOf(camera.position);
+        const to = sphericalOf(position);
+        to.theta = from.theta + shortestTurn(to.theta - from.theta);
+        orbit = {from, to, duration, started: performance.now()};
+    }
+
+    function sphericalOf({x, y, z}) {
+        const offset = new THREE.Vector3(x, y, z).sub(controls.target);
+        return new THREE.Spherical().setFromVector3(offset);
+    }
+
+    function advanceOrbit() {
+        if (!orbit) return;
+        const progress = Math.min(1, (performance.now() - orbit.started) / orbit.duration);
+        const eased = progress * progress * (3 - 2 * progress);
+        spherical.set(
+            mix(orbit.from.radius, orbit.to.radius, eased),
+            mix(orbit.from.phi, orbit.to.phi, eased),
+            mix(orbit.from.theta, orbit.to.theta, eased));
+        camera.position.setFromSpherical(spherical).add(controls.target);
+        if (progress === 1) orbit = null;
+    }
+
     function start(onFrame) {
         renderer.setAnimationLoop(() => {
+            advanceOrbit();
             controls.update();
             onFrame?.();
             renderer.render(scene, camera);
@@ -57,8 +87,19 @@ export function createViewer(container) {
 
     applyTheme();
     new ResizeObserver(resize).observe(container);
+    controls.addEventListener('start', () => {
+        orbit = null;
+    });
 
-    return {canvas: renderer.domElement, add: (object) => scene.add(object), pick, applyTheme, start};
+    return {
+        canvas: renderer.domElement,
+        add: (object) => scene.add(object),
+        pick,
+        applyTheme,
+        orbitTo,
+        cameraPose: () => camera.position.clone(),
+        start,
+    };
 }
 
 function createControls(camera, domElement) {
@@ -76,6 +117,14 @@ function createControls(camera, domElement) {
         RIGHT: null,
     };
     return controls;
+}
+
+function mix(from, to, k) {
+    return from + (to - from) * k;
+}
+
+function shortestTurn(angle) {
+    return Math.atan2(Math.sin(angle), Math.cos(angle));
 }
 
 function verticalFovFor(aspect) {

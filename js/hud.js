@@ -1,7 +1,7 @@
 import {t} from './i18n.js';
 import {angleBetween, formatMillerIndexHTML} from './miller.js';
 
-export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBeforeRender}) {
+export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBeforeRender, startTutorial}) {
     const referenceEl = document.getElementById('current-face');
     const referenceLabelEl = document.getElementById('face-label');
     const referenceIndexEl = document.getElementById('facing-index');
@@ -13,6 +13,10 @@ export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBefo
     const expanded = new Set();
 
     listEl.addEventListener('click', (e) => {
+        if (e.target.closest('.hint-tutorial')) {
+            startTutorial();
+            return;
+        }
         const head = e.target.closest('.group-head');
         if (head) {
             toggleGroup(head.parentElement);
@@ -37,6 +41,15 @@ export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBefo
         showAngleCalc(row, calcHeaderHTML(ref, other), ref.label, other.label);
     }
 
+    // Lets the tutorial demonstrate the calculation
+    function openCalcFor(faceIndex) {
+        const row = listEl.querySelector(`.angle-row[data-face="${faceIndex}"]`);
+        if (!row) return null;
+        row.scrollIntoView({block: 'nearest'});
+        openAngleCalc(row);
+        return row;
+    }
+
     function renderReference() {
         const face = faces[selection.referenceIndex()];
         if (!face) {
@@ -57,7 +70,6 @@ export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBefo
 
         if (selected.length === 0) {
             expanded.clear();
-            listEl.innerHTML = hintHTML(isTouchInput() ? t().hint_empty_touch : t().hint_empty);
             return;
         }
         if (selected.length === 1) {
@@ -86,7 +98,7 @@ export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBefo
         renderAngles();
     }
 
-    return {render};
+    return {render, openCalcFor};
 }
 
 function countFamilies(faces) {

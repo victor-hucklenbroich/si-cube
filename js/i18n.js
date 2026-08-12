@@ -5,15 +5,37 @@ export const translations = {
         title: "Silizium Würfel",
         subtitle: "Millersche Indizes",
         angles: "WINKEL",
-        rotate: "Drehen",
         reference: "Referenzebene",
-        select: "Auswählen",
-        zoom: "Zoom",
-        hint_empty: "Rechtsklick auf eine Ebene (•••) um diese auszuwählen. Shift+Rechtsklick wählt alle äquivalenten Ebenen {•••} aus.",
-        hint_empty_touch: "Tippe auf eine Ebene (•••) um diese auszuwählen. Langes Drücken wählt alle äquivalenten Ebenen {•••} aus.",
+        hint_empty: "Rechtsklick auf eine Ebene des Würfels, um zu starten.",
+        hint_empty_touch: "Tippe auf eine Ebene des Würfels, um zu starten.",
         hint_single: "Wähle eine weitere Ebene, um dessen Winkel zu vergleichen.",
         formula_plane1: "Indizes Ebene 1",
         formula_plane2: "Indizes Ebene 2",
+        tutorial_button: "Tutorial",
+        tutorial_start: "Tutorial anzeige",
+        tutorial_skip: "Überspringen",
+        tutorial_back: "Zurück",
+        tutorial_next: "Weiter",
+        tutorial_done: "Fertig",
+        tutorial_cube_title: "Der Silizium-Würfel",
+        tutorial_cube_body: "Jede Fläche ist eine Kristallebene, beschriftet mit ihrem Millerschen Index: 6 Würfelflächen {100}, 12 Kantenschnitte {110} und 8 Eckschnitte {111}. Die Farben entsprechen der Legende unten im Panel.",
+        tutorial_view_title: "Drehen und Zoomen",
+        tutorial_view_body: "<kbd>Ziehen (Linksklick)</kbd> dreht den Würfel, <kbd>Scrollen</kbd> zoomt hinein und heraus.",
+        tutorial_view_body_touch: "<kbd>Ziehen</kbd> dreht den Würfel, <kbd>zwei Finger</kbd> zoomen hinein und heraus.",
+        tutorial_reference_title: "Die Referenzebene",
+        tutorial_reference_body: "<kbd>Rechtsklick</kbd> wählt eine Ebene aus. Die erste ausgewählte Ebene wird zur Referenz. Alle Winkel beziehen sich auf sie.",
+        tutorial_reference_body_touch: "<kbd>Tippen</kbd> wählt eine Ebene aus. Die erste ausgewählte Ebene wird zur Referenz. Alle Winkel beziehen sich auf sie.",
+        tutorial_angles_title: "Winkel zur Referenz",
+        tutorial_angles_body: "Jede weitere ausgewählte Ebene erscheint mit ihrem Winkel zur Referenz. Angegeben wird immer der spitze Winkel zwischen beiden Ebenen, also nie mehr als 90°.",
+        tutorial_family_title: "Äquivalente Ebenen'",
+        tutorial_family_body: "<kbd>Shift + Rechtsklick</kbd> oder <kbd>Rechtsklick</kbd> gedrückt halten wählt alle äquivalenten Ebenen {•••} auf einmal aus.",
+        tutorial_family_body_touch: "<kbd>Langes Drücken</kbd> wählt alle äquivalenten Ebenen {•••} auf einmal aus.",
+        tutorial_calc_title: "Rechenweg anzeigen",
+        tutorial_calc_body: "Ein Klick auf einen Winkel zeigt Schritt für Schritt, wie er berechnet wurde. Das <kbd>i</kbd> zeigt die allgemeine Formel.",
+        tutorial_calc_body_touch: "Ein Tippen auf einen Winkel zeigt Schritt für Schritt, wie er berechnet wurde. Das <kbd>i</kbd> zeigt die allgemeine Formel.",
+        tutorial_controls_title: "Zurücksetzen",
+        tutorial_controls_body: "<kbd>Esc</kbd>, das <kbd>×</kbd> im Panel oder ein <kbd>Rechtsklick</kbd> ins Leere löscht die Auswahl.",
+        tutorial_controls_body_touch: "Das <kbd>×</kbd> im Panel oder ein <kbd>Tippen</kbd> ins Leere löscht die Auswahl.",
         impressum: "Impressum",
         impressum_html: `
             <p class="legal-label">Angaben gemäß § 5 DDG</p>
@@ -32,7 +54,7 @@ export const translations = {
             <p>Diese Seite ist eine rein statische Web-Anwendung. Es gibt keine Benutzerkonten, keine Formulare, keine Cookies und kein seitenübergreifendes Tracking. Sämtliche Berechnungen laufen ausschließlich in Ihrem Browser. Ihre Auswahl von Ebenen und die daraus berechneten Winkel werden zu keinem Zeitpunkt an einen Server übertragen.</p>
 
             <p class="legal-label">Einstellungen auf Ihrem Gerät</p>
-            <p>Ihre Auswahl von Farbschema (hell/dunkel) und Sprache (DE/EN) wird lokal in Ihrem Browser gespeichert (<code>localStorage</code>), damit sie beim nächsten Besuch erhalten bleibt. Diese beiden Werte verlassen Ihr Gerät nicht und enthalten keine Kennungen oder personenbezogenen Daten. Die Speicherung ist für die von Ihnen ausdrücklich gewünschte Funktion unbedingt erforderlich und daher nach § 25 Abs. 2 Nr. 2 TDDDG einwilligungsfrei. Sie können sie jederzeit über die Website-Daten Ihres Browsers löschen.</p>
+            <p>Ihre Auswahl von Farbschema (hell/dunkel) und Sprache (DE/EN) sowie ein Vermerk darüber, dass die Einführungstour bereits angezeigt wurde, werden lokal in Ihrem Browser gespeichert (<code>localStorage</code>), damit sie beim nächsten Besuch erhalten bleiben. Diese Werte verlassen Ihr Gerät nicht und enthalten keine Kennungen oder personenbezogenen Daten. Die Speicherung ist für die von Ihnen ausdrücklich gewünschte Funktion unbedingt erforderlich und daher nach § 25 Abs. 2 Nr. 2 TDDDG einwilligungsfrei. Sie können sie jederzeit über die Website-Daten Ihres Browsers löschen.</p>
 
             <p class="legal-label">Hosting</p>
             <p>Die Seite wird über GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA) ausgeliefert. Beim Abruf verarbeitet GitHub technisch notwendige Server-Logdaten, insbesondere IP-Adresse, Datum und Uhrzeit, die abgerufene Datei sowie den User-Agent. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren und effizienten Bereitstellung des Angebots). GitHub ist unter dem EU-US Data Privacy Framework zertifiziert.</p>
@@ -63,15 +85,37 @@ export const translations = {
         title: "Silicon Cube",
         subtitle: "Miller Indices",
         angles: "ANGLES",
-        rotate: "Rotate",
         reference: "Reference Plane",
-        select: "Select",
-        zoom: "Zoom",
-        hint_empty: "Right-click a plane (•••) to select. Shift+right-click selects all equivalent planes {•••}.",
-        hint_empty_touch: "Tap a plane (•••) to select. Long-press selects all equivalent planes {•••}.",
+        hint_empty: "Right-click a plane on the cube to get started.",
+        hint_empty_touch: "Tap a plane on the cube to get started.",
         hint_single: "Select another plane to compare their angles.",
         formula_plane1: "indices of plane 1",
         formula_plane2: "indices of plane 2",
+        tutorial_button: "Tutorial",
+        tutorial_start: "Take the quick tour",
+        tutorial_skip: "Skip",
+        tutorial_back: "Back",
+        tutorial_next: "Next",
+        tutorial_done: "Done",
+        tutorial_cube_title: "The silicon cube",
+        tutorial_cube_body: "Every face is a crystal plane, labelled with its Miller index: 6 cube faces {100}, 12 edge cuts {110} and 8 corner cuts {111}. The colours match the legend at the bottom of the panel.",
+        tutorial_view_title: "Rotate and zoom",
+        tutorial_view_body: "<kbd>Drag (left-click)</kbd> anywhere to orbit around the cube, <kbd>scroll</kbd> to zoom in and out.",
+        tutorial_view_body_touch: "<kbd>Drag</kbd> anywhere to orbit around the cube, <kbd>pinch</kbd> to zoom in and out.",
+        tutorial_reference_title: "The reference plane",
+        tutorial_reference_body: "<kbd>Right-click</kbd> a plane to select it. The first plane you pick becomes the reference. Every angle is measured against it.",
+        tutorial_reference_body_touch: "<kbd>Tap</kbd> a plane to select it. The first plane you pick becomes the reference. Every angle is measured against it.",
+        tutorial_angles_title: "Angles to the reference",
+        tutorial_angles_body: "Every further plane you select is listed with its angle to the reference. It is always the acute angle between the two planes, so it never exceeds 90°.",
+        tutorial_family_title: "Equivalent Planes",
+        tutorial_family_body: "<kbd>Shift + right-click</kbd> or holding <kbd>right-click</kbd> selects every equivalent plane {•••}.",
+        tutorial_family_body_touch: "<kbd>Long-press</kbd> selects every equivalent plane {•••}.",
+        tutorial_calc_title: "Show the calculation",
+        tutorial_calc_body: "Click any angle to see how it was calculated, step by step. The <kbd>i</kbd> shows the general formula.",
+        tutorial_calc_body_touch: "Tap any angle to see how it was calculated, step by step. The <kbd>i</kbd> shows the general formula.",
+        tutorial_controls_title: "Clearing",
+        tutorial_controls_body: "<kbd>Esc</kbd>, the <kbd>×</kbd> in the panel or a <kbd>right-click</kbd> into empty space clears the selection.",
+        tutorial_controls_body_touch: "The <kbd>×</kbd> in the panel or a <kbd>tap</kbd> into empty space clears the selection.",
         impressum: "Imprint",
         impressum_html: `
             <p class="legal-label">Information pursuant to § 5 DDG</p>
@@ -90,7 +134,7 @@ export const translations = {
             <p>This site is a purely static web application. There are no user accounts, no forms, no cookies and no cross-site tracking. All calculations run entirely in your browser. The planes you select and the angles derived from them are never transmitted to any server.</p>
 
             <p class="legal-label">Settings stored on your device</p>
-            <p>Your choice of colour scheme (light/dark) and language (DE/EN) is stored locally in your browser (<code>localStorage</code>) so that it persists across visits. These two values never leave your device and contain no identifiers or personal data. Storing them is strictly necessary to provide a feature you explicitly requested and therefore requires no consent under § 25(2) no. 2 TDDDG. You can delete them at any time via your browser's site data settings.</p>
+            <p>Your choice of colour scheme (light/dark) and language (DE/EN), together with a note that the introductory tour has already been shown, are stored locally in your browser (<code>localStorage</code>) so that they persist across visits. These values never leave your device and contain no identifiers or personal data. Storing them is strictly necessary to provide a feature you explicitly requested and therefore requires no consent under § 25(2) no. 2 TDDDG. You can delete them at any time via your browser's site data settings.</p>
 
             <p class="legal-label">Hosting</p>
             <p>This site is served by GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). When you access it, GitHub processes technically necessary server log data, in particular your IP address, the date and time, the file requested and the user agent. The legal basis is Art. 6(1)(f) GDPR (legitimate interest in providing the site securely and efficiently). GitHub is certified under the EU-US Data Privacy Framework.</p>
@@ -140,6 +184,11 @@ export function applyLanguage(lang = current) {
     document.querySelectorAll('[data-i18n]').forEach((el) => {
         const text = translations[lang][el.getAttribute('data-i18n')];
         if (text) el.textContent = text;
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+        const text = translations[lang][el.getAttribute('data-i18n-title')];
+        if (text) el.title = text;
     });
 
     const btn = document.getElementById('btn-lang');

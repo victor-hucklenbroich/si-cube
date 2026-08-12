@@ -44,6 +44,7 @@
     <div id="toolbar">
       <button id="btn-lang" title="Deutsch / English"></button>
       <button id="btn-theme" title="Light / Dark"></button>
+      <button id="btn-tutorial" data-i18n-title="tutorial_button">?</button>
     </div>
 
     <div id="canvas-footer">
@@ -54,14 +55,6 @@
           <button id="impressum-link" class="legal-link" type="button" data-i18n="impressum"></button>
           <span class="ver-sep">·</span>
           <button id="privacy-link" class="legal-link" type="button" data-i18n="privacy"></button>
-        </div>
-
-        <div id="controls-hint">
-          <span class="ctrl"><span class="ctrl-icon m">◧</span><span class="ctrl-icon t">↻</span><span data-i18n="rotate"></span></span>
-          <span class="sep">·</span>
-          <span class="ctrl"><span class="ctrl-icon m">◨</span><span class="ctrl-icon t">◉</span><span data-i18n="select"></span></span>
-          <span class="sep">·</span>
-          <span class="ctrl"><span class="ctrl-icon">◎</span><span data-i18n="zoom"></span></span>
         </div>
       </div>
     </div>
@@ -127,6 +120,20 @@
       <button id="legal-close" type="button" aria-label="Close">×</button>
       <h2 id="legal-title"></h2>
       <div id="legal-body"></div>
+    </div>
+  </div>
+
+  <div id="tutorial-dim" aria-hidden="true"></div>
+  <div id="tutorial-card" role="dialog" aria-labelledby="tutorial-title">
+    <div id="tutorial-dots" aria-hidden="true"></div>
+    <h2 id="tutorial-title"></h2>
+    <div id="tutorial-body"></div>
+    <div class="tutorial-actions">
+      <button id="tutorial-skip" class="tutorial-btn tutorial-ghost" type="button" data-i18n="tutorial_skip"></button>
+      <div class="tutorial-nav">
+        <button id="tutorial-back" class="tutorial-btn" type="button" data-i18n="tutorial_back"></button>
+        <button id="tutorial-next" class="tutorial-btn tutorial-primary" type="button"></button>
+      </div>
     </div>
   </div>
 
