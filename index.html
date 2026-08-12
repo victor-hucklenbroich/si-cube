@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="google-site-verification" content="owP5_JeMH11U_YJ5N60rf3nh5cwTQQBfVnATqDtGSLc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,21 +37,14 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
   <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "918adf159b7840f18ebc4d56bc25d51a"}'></script>
 </head>
 <body>
   <div id="canvas-container">
     <div id="toolbar">
-      <button id="btn-lang" onclick="switchLanguage()" title="Deutsch / English"></button>
-      <button id="btn-theme" onclick="switchTheme()" title="Light / Dark"></button>
+      <button id="btn-lang" title="Deutsch / English"></button>
+      <button id="btn-theme" title="Light / Dark"></button>
+      <button id="btn-tutorial" data-i18n-title="tutorial_button">?</button>
     </div>
 
     <div id="canvas-footer">
@@ -51,15 +52,9 @@
         <div id="version-text">
           <span class="ver">dev</span>
           <span class="ver-sep">·</span>
-          <button id="impressum-link" type="button" data-i18n="impressum" onclick="openImpressum()"></button>
-        </div>
-
-        <div id="controls-hint">
-          <span class="ctrl"><span class="ctrl-icon m">◧</span><span class="ctrl-icon t">↻</span><span data-i18n="rotate"></span></span>
-          <span class="sep">·</span>
-          <span class="ctrl"><span class="ctrl-icon m">◨</span><span class="ctrl-icon t">◉</span><span data-i18n="select"></span></span>
-          <span class="sep">·</span>
-          <span class="ctrl"><span class="ctrl-icon">◎</span><span data-i18n="zoom"></span></span>
+          <button id="impressum-link" class="legal-link" type="button" data-i18n="impressum"></button>
+          <span class="ver-sep">·</span>
+          <button id="privacy-link" class="legal-link" type="button" data-i18n="privacy"></button>
         </div>
       </div>
     </div>
@@ -92,7 +87,7 @@
           <span class="hud-label" data-i18n="angles"></span>
           <span class="info-wrapper">
             <button class="info-btn" type="button" aria-label="Show formula" aria-expanded="false">i</button>
-            <div class="info-popup" role="dialog" aria-label="Angle formula">
+            <div class="info-popup" id="formula-popup" role="dialog" aria-label="Angle formula">
               <div class="formula" id="formula"></div>
               <div class="formula-legend">
                 <div><span class="leg-key">(h, k, l)</span> = <span data-i18n="formula_plane1"></span></div>
@@ -101,7 +96,7 @@
             </div>
           </span>
         </div>
-        <button id="clear-btn" onclick="clearSelection()" title="Clear (Esc)" aria-label="Clear selection">×</button>
+        <button id="clear-btn" title="Clear (Esc)" aria-label="Clear selection">×</button>
       </div>
       <div id="angle-list"></div>
     </div>
@@ -120,11 +115,25 @@
     <div class="formula" id="calc-formula"></div>
   </div>
 
-  <div id="impressum-overlay" onclick="closeImpressumBackdrop(event)">
-    <div id="impressum-modal" role="dialog" aria-modal="true" aria-labelledby="impressum-title">
-      <button id="impressum-close" type="button" onclick="closeImpressum()" aria-label="Close">×</button>
-      <h2 id="impressum-title" data-i18n="impressum"></h2>
-      <div id="impressum-body"></div>
+  <div id="legal-overlay">
+    <div id="legal-modal" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+      <button id="legal-close" type="button" aria-label="Close">×</button>
+      <h2 id="legal-title"></h2>
+      <div id="legal-body"></div>
+    </div>
+  </div>
+
+  <div id="tutorial-dim" aria-hidden="true"></div>
+  <div id="tutorial-card" role="dialog" aria-labelledby="tutorial-title">
+    <div id="tutorial-dots" aria-hidden="true"></div>
+    <h2 id="tutorial-title"></h2>
+    <div id="tutorial-body"></div>
+    <div class="tutorial-actions">
+      <button id="tutorial-skip" class="tutorial-btn tutorial-ghost" type="button" data-i18n="tutorial_skip"></button>
+      <div class="tutorial-nav">
+        <button id="tutorial-back" class="tutorial-btn" type="button" data-i18n="tutorial_back"></button>
+        <button id="tutorial-next" class="tutorial-btn tutorial-primary" type="button"></button>
+      </div>
     </div>
   </div>
 

@@ -19,6 +19,9 @@ Intended to make the lectures Silicon cube more accessible and help with visuali
 
 ## Usage
 
+_The **?** button in the toolbar runs a short interactive tour that demonstrates everything below on
+the cube itself. It opens by itself on a first visit and can be replayed at any time._
+
 The app is adapted for both desktop use and touchscreens.
 
 |                                | Mouse                            | Touch           |
