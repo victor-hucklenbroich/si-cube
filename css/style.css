@@ -393,6 +393,46 @@ canvas {
 .angle-row .deg { color: var(--text-dim); font-size: 14px; text-align: right; min-width: 56px; transition: color 0.12s; }
 .angle-row:hover .deg { color: var(--text-bright); }
 
+/* Collapsed family */
+.group-head .chev {
+  width: 12px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  font-size: 15px;
+  line-height: 1;
+  text-align: center;
+  transition: transform 0.18s, color 0.12s;
+}
+.group-head:hover .chev { color: var(--text-bright); }
+.angle-group.expanded .chev { transform: rotate(90deg); }
+
+.group-head .count {
+  color: var(--text-dim);
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+/* Stands in for the degrees when the family angles differ */
+.group-head .deg-varies {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.group-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.18s ease;
+}
+.angle-group.expanded .group-body { grid-template-rows: 1fr; }
+
+.group-rows {
+  overflow: hidden;
+  margin-left: 15px;
+  border-left: 1px solid var(--surface-border);
+}
+.group-rows .angle-row { padding-left: 10px; }
+
 #panel-footer {
   padding: 10px 14px 14px;
   display: flex;

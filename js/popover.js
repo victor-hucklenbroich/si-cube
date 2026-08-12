@@ -115,7 +115,7 @@ function createAngleCalcPopover({onOpen}) {
     }
 
     document.addEventListener('click', (e) => {
-        if (isOpen() && !popup.contains(e.target) && !e.target.closest('.angle-row')) close();
+        if (isOpen() && !popup.contains(e.target) && !e.target.closest('.angle-row[data-face]')) close();
     });
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') close();
