@@ -525,7 +525,7 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
   pointer-events: none;
 }
 #version-text .ver-sep { opacity: 0.5; }
-#impressum-link {
+.legal-link {
   pointer-events: auto;
   cursor: pointer;
   background: none;
@@ -538,10 +538,10 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
   text-underline-offset: 2px;
   transition: color 0.15s;
 }
-#impressum-link:hover { color: var(--text); }
+.legal-link:hover { color: var(--text); }
 
-/* Impressum modal */
-#impressum-overlay {
+/* Legal modal (imprint + privacy policy) */
+#legal-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -559,9 +559,9 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
            calc(20px + env(safe-area-inset-bottom, 0px))
            calc(20px + env(safe-area-inset-left, 0px));
 }
-#impressum-overlay.open { opacity: 1; visibility: visible; }
+#legal-overlay.open { opacity: 1; visibility: visible; }
 
-#impressum-modal {
+#legal-modal {
   position: relative;
   width: min(440px, 100%);
   max-height: 100%;
@@ -577,9 +577,9 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
   transform: translateY(6px) scale(0.98);
   transition: transform 0.18s;
 }
-#impressum-overlay.open #impressum-modal { transform: translateY(0) scale(1); }
+#legal-overlay.open #legal-modal { transform: translateY(0) scale(1); }
 
-#impressum-modal h2 {
+#legal-modal h2 {
   font-family: var(--mono);
   font-size: 16px;
   font-weight: 500;
@@ -587,7 +587,7 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
   margin-bottom: 6px;
 }
 
-#impressum-close {
+#legal-close {
   position: absolute;
   top: 14px;
   right: 14px;
@@ -600,15 +600,15 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
   cursor: pointer;
   transition: color 0.15s;
 }
-#impressum-close:hover { color: var(--text-bright); }
+#legal-close:hover { color: var(--text-bright); }
 
-#impressum-body {
+#legal-body {
   font-family: var(--sans);
   font-size: 13px;
   line-height: 1.6;
   color: var(--text);
 }
-#impressum-body .legal-label {
+#legal-body .legal-label {
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -617,15 +617,33 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
   margin-top: 14px;
   margin-bottom: 2px;
 }
-#impressum-body a { color: var(--accent-100); text-decoration: none; }
-#impressum-body a:hover { text-decoration: underline; }
-#impressum-body .legal-disclaimer {
+#legal-body a { color: var(--accent-100); text-decoration: none; }
+#legal-body a:hover { text-decoration: underline; }
+#legal-body .legal-disclaimer {
   margin-top: 18px;
   padding-top: 14px;
   border-top: 1px solid var(--surface-border);
   font-size: 12px;
   color: var(--text-dim);
 }
+#legal-body p + p { margin-top: 8px; }
+#legal-body ul {
+  margin-top: 6px;
+  padding-left: 18px;
+  list-style: disc;
+}
+#legal-body li { margin-top: 3px; }
+#legal-body em { font-style: italic; }
+#legal-body code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(128, 128, 128, 0.15);
+}
+
+/* The privacy policy is far longer than the imprint, so give it more room. */
+#legal-overlay.doc-privacy #legal-modal { width: min(560px, 100%); }
 
 #angle-list::-webkit-scrollbar { width: 4px; }
 #angle-list::-webkit-scrollbar-track { background: transparent; }
