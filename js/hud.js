@@ -1,7 +1,7 @@
 import {t} from './i18n.js';
 import {angleBetween, formatMillerIndexHTML} from './miller.js';
 
-export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBeforeRender, startTutorial}) {
+export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBeforeRender}) {
     const referenceEl = document.getElementById('current-face');
     const referenceLabelEl = document.getElementById('face-label');
     const referenceIndexEl = document.getElementById('facing-index');
@@ -13,10 +13,6 @@ export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBefo
     const expanded = new Set();
 
     listEl.addEventListener('click', (e) => {
-        if (e.target.closest('.hint-tutorial')) {
-            startTutorial();
-            return;
-        }
         const head = e.target.closest('.group-head');
         if (head) {
             toggleGroup(head.parentElement);
@@ -70,6 +66,7 @@ export function createHud(faces, selection, {isTouchInput, showAngleCalc, onBefo
 
         if (selected.length === 0) {
             expanded.clear();
+            listEl.innerHTML = hintHTML(isTouchInput() ? t().hint_empty_touch : t().hint_empty);
             return;
         }
         if (selected.length === 1) {

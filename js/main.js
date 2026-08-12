@@ -44,7 +44,6 @@ async function init() {
         showAngleCalc: popovers.showAngleCalc,
         // Whatever the HUD is about to redraw for, any open popover is now stale
         onBeforeRender: popovers.closeAll,
-        startTutorial: () => tutorial.start(),
     });
 
     const tutorial = createTutorial({
