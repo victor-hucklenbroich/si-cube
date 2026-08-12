@@ -35,6 +35,8 @@ export const translations = {
         tutorial_controls_title: "Zurücksetzen",
         tutorial_controls_body: "<kbd>Esc</kbd>, das <kbd>×</kbd> im Panel oder ein <kbd>Rechtsklick</kbd> ins Leere löscht die Auswahl.",
         tutorial_controls_body_touch: "Das <kbd>×</kbd> im Panel oder ein <kbd>Tippen</kbd> ins Leere löscht die Auswahl.",
+        tutorial_settings_title: "Einstellungen",
+        tutorial_settings_body: "Hier können Einstellung gewählt und dieses Tutorial jederzeit erneut abgespielt werden.",
         impressum: "Impressum",
         impressum_html: `
             <p class="legal-label">Angaben gemäß § 5 DDG</p>
@@ -114,6 +116,8 @@ export const translations = {
         tutorial_controls_title: "Clearing",
         tutorial_controls_body: "<kbd>Esc</kbd>, the <kbd>×</kbd> in the panel or a <kbd>right-click</kbd> into empty space clears the selection.",
         tutorial_controls_body_touch: "The <kbd>×</kbd> in the panel or a <kbd>tap</kbd> into empty space clears the selection.",
+        tutorial_settings_title: "Settings",
+        tutorial_settings_body: "Here you can pick settings, and replay this tutorial at any time.",
         impressum: "Imprint",
         impressum_html: `
             <p class="legal-label">Information pursuant to § 5 DDG</p>

@@ -91,6 +91,15 @@ export function createTutorial(app) {
         {
             key: 'controls',
             enter() {
+                // Keeps the demo planes so there is something for the × to clear
+                app.select(DEMO_PLANES, DEMO.corner);
+                app.orbitTo(POSE.wide);
+                return angleTableEl;
+            },
+        },
+        {
+            key: 'settings',
+            enter() {
                 app.select([]);
                 app.orbitTo(POSE.hero);
                 return toolbarEl;
