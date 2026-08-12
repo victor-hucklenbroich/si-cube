@@ -608,7 +608,7 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
   line-height: 1.6;
   color: var(--text);
 }
-#impressum-body .imp-label {
+#impressum-body .legal-label {
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -619,7 +619,7 @@ body.input-touch #controls-hint .ctrl-icon.t { display: inline; }
 }
 #impressum-body a { color: var(--accent-100); text-decoration: none; }
 #impressum-body a:hover { text-decoration: underline; }
-#impressum-body .imp-disclaimer {
+#impressum-body .legal-disclaimer {
   margin-top: 18px;
   padding-top: 14px;
   border-top: 1px solid var(--surface-border);

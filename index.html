@@ -51,7 +51,9 @@
         <div id="version-text">
           <span class="ver">dev</span>
           <span class="ver-sep">·</span>
-          <button id="impressum-link" type="button" data-i18n="impressum"></button>
+          <button id="impressum-link" class="legal-link" type="button" data-i18n="impressum"></button>
+          <span class="ver-sep">·</span>
+          <button id="privacy-link" class="legal-link" type="button" data-i18n="privacy"></button>
         </div>
 
         <div id="controls-hint">
@@ -120,11 +122,11 @@
     <div class="formula" id="calc-formula"></div>
   </div>
 
-  <div id="impressum-overlay">
-    <div id="impressum-modal" role="dialog" aria-modal="true" aria-labelledby="impressum-title">
-      <button id="impressum-close" type="button" aria-label="Close">×</button>
-      <h2 id="impressum-title" data-i18n="impressum"></h2>
-      <div id="impressum-body"></div>
+  <div id="legal-overlay">
+    <div id="legal-modal" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+      <button id="legal-close" type="button" aria-label="Close">×</button>
+      <h2 id="legal-title"></h2>
+      <div id="legal-body"></div>
     </div>
   </div>
 

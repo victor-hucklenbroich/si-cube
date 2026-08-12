@@ -1,7 +1,7 @@
 import {buildCube} from './cube.js';
 import {createHud} from './hud.js';
 import {applyLanguage, onLanguageChange, toggleLanguage} from './i18n.js';
-import {createImpressum} from './impressum.js';
+import {createLegal} from './legal.js';
 import {createInput} from './input.js';
 import {createPopovers} from './popover.js';
 import {createSelection} from './selection.js';
@@ -18,7 +18,7 @@ async function init() {
     const cube = buildCube(data);
     const selection = createSelection(cube.faces);
     const popovers = createPopovers();
-    const impressum = createImpressum();
+    const legal = createLegal();
     viewer.add(cube.group);
 
     const faceMeshes = cube.faces.map((face) => face.mesh);
@@ -67,7 +67,7 @@ async function init() {
     document.getElementById('clear-btn').addEventListener('click', clearSelection);
     window.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
-        if (impressum.isOpen()) impressum.close();
+        if (legal.isOpen()) legal.close();
         else clearSelection();
     });
 
