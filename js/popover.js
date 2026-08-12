@@ -138,12 +138,17 @@ function buildAngleLatex(ref, other) {
     const b = hp * hp + kp * kp + lp * lp;
     const cosVal = Math.abs(num) / Math.sqrt(a * b);
     const angle = Math.acos(Math.min(1, cosVal)) * 180 / Math.PI;
+    const cosStr = trimZeros(cosVal.toFixed(4));
 
     return String.raw`\begin{aligned}
 \cos(\alpha) &= \frac{\left|\,${prod(h, hp)}+${prod(k, kp)}+${prod(l, lp)}\,\right|}{\sqrt{(${sq(h)}+${sq(k)}+${sq(l)})(${sq(hp)}+${sq(kp)}+${sq(lp)})}} \\[6pt]
-&= \frac{${Math.abs(num)}}{\sqrt{${a}\cdot ${b}}} = ${cosVal.toFixed(4)} \\[6pt]
-\alpha &= \cos^{-1}(${cosVal.toFixed(4)}) = ${angle.toFixed(1)}^{\circ}
+&= \frac{${Math.abs(num)}}{\sqrt{${a}\cdot ${b}}} = ${cosStr} \\[6pt]
+\alpha &= \cos^{-1}(${cosStr}) = ${angle.toFixed(1)}^{\circ}
 \end{aligned}`;
+}
+
+function trimZeros(str) {
+    return str.includes('.') ? str.replace(/0+$/, '').replace(/\.$/, '') : str;
 }
 
 function fitFormula(el) {
