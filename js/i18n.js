@@ -37,9 +37,6 @@ export const translations = {
             <p class="legal-label">Hosting</p>
             <p>Die Seite wird über GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA) ausgeliefert. Beim Abruf verarbeitet GitHub technisch notwendige Server-Logdaten, insbesondere IP-Adresse, Datum und Uhrzeit, die abgerufene Datei sowie den User-Agent. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren und effizienten Bereitstellung des Angebots). GitHub ist unter dem EU-US Data Privacy Framework zertifiziert.</p>
 
-            <p class="legal-label">Reichweitenmessung</p>
-            <p>Zur Messung der Seitenaufrufe wird Cloudflare Web Analytics (Cloudflare, Inc., USA) eingesetzt. Der Dienst arbeitet ohne Cookies, ohne Speicherung auf Ihrem Endgerät und ohne Fingerprinting und bildet keine geräteübergreifenden Nutzerprofile. Ihre IP-Adresse wird zur Erstellung aggregierter Statistiken verarbeitet und nicht dauerhaft gespeichert. Da nicht auf Informationen in Ihrem Endgerät zugegriffen wird, ist keine Einwilligung nach § 25 TDDDG erforderlich; Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der statistischen Auswertung der Nutzung). Cloudflare ist unter dem EU-US Data Privacy Framework zertifiziert.</p>
-
             <p class="legal-label">Externe Ressourcen</p>
             <p>Beim Aufruf der Seite werden Schriftarten und Programmbibliotheken von externen Servern nachgeladen. Dabei wird Ihre IP-Adresse technisch bedingt an den jeweiligen Anbieter übertragen:</p>
             <ul>
@@ -48,6 +45,9 @@ export const translations = {
                 <li>jsDelivr (Prospect One, Polen) &ndash; Formelsatz <em>KaTeX</em></li>
             </ul>
             <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer performanten und einheitlichen Darstellung des Angebots).</p>
+            
+            <p class="legal-label">Reichweitenmessung</p>
+            <p>Zur Messung der Seitenaufrufe wird Cloudflare Web Analytics (Cloudflare, Inc., USA) eingesetzt. Der Dienst arbeitet ohne Cookies, ohne Speicherung auf Ihrem Endgerät und ohne Fingerprinting und bildet keine geräteübergreifenden Nutzerprofile. Ihre IP-Adresse wird zur Erstellung aggregierter Statistiken verarbeitet und nicht dauerhaft gespeichert. Da nicht auf Informationen in Ihrem Endgerät zugegriffen wird, ist keine Einwilligung nach § 25 TDDDG erforderlich; Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der statistischen Auswertung der Nutzung). Cloudflare ist unter dem EU-US Data Privacy Framework zertifiziert.</p>
 
             <p class="legal-label">Kontakt per E-Mail</p>
             <p>Wenn Sie mich per E-Mail kontaktieren, verarbeite ich Ihre Angaben ausschließlich zur Bearbeitung Ihrer Anfrage (Art. 6 Abs. 1 lit. f DSGVO). Die Daten werden gelöscht, sobald sie hierfür nicht mehr erforderlich sind.</p>
@@ -95,9 +95,6 @@ export const translations = {
             <p class="legal-label">Hosting</p>
             <p>This site is served by GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). When you access it, GitHub processes technically necessary server log data, in particular your IP address, the date and time, the file requested and the user agent. The legal basis is Art. 6(1)(f) GDPR (legitimate interest in providing the site securely and efficiently). GitHub is certified under the EU-US Data Privacy Framework.</p>
 
-            <p class="legal-label">Analytics</p>
-            <p>Cloudflare Web Analytics (Cloudflare, Inc., USA) is used to count page views. The service works without cookies, without storing anything on your device and without fingerprinting, and it does not build cross-device user profiles. Your IP address is processed to generate aggregate statistics and is not stored permanently. Because no information is accessed on your device, no consent is required under § 25 TDDDG; the legal basis is Art. 6(1)(f) GDPR (legitimate interest in statistical analysis of usage). Cloudflare is certified under the EU-US Data Privacy Framework.</p>
-
             <p class="legal-label">External resources</p>
             <p>When the page loads, fonts and software libraries are fetched from external servers. This necessarily transmits your IP address to the respective provider:</p>
             <ul>
@@ -106,6 +103,9 @@ export const translations = {
                 <li>jsDelivr (Prospect One, Poland) &ndash; the <em>KaTeX</em> formula renderer</li>
             </ul>
             <p>The legal basis is Art. 6(1)(f) GDPR (legitimate interest in fast and consistent presentation of the site).</p>
+            
+            <p class="legal-label">Analytics</p>
+            <p>Cloudflare Web Analytics (Cloudflare, Inc., USA) is used to count page views. The service works without cookies, without storing anything on your device and without fingerprinting, and it does not build cross-device user profiles. Your IP address is processed to generate aggregate statistics and is not stored permanently. Because no information is accessed on your device, no consent is required under § 25 TDDDG; the legal basis is Art. 6(1)(f) GDPR (legitimate interest in statistical analysis of usage). Cloudflare is certified under the EU-US Data Privacy Framework.</p>
 
             <p class="legal-label">Contact by email</p>
             <p>If you contact me by email, I process the information you provide solely in order to handle your enquiry (Art. 6(1)(f) GDPR). The data is deleted once it is no longer required for that purpose.</p>
