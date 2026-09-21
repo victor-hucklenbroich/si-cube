@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import {REFERENCE_COLORS} from './config.js';
+import {CAMERA, REFERENCE_COLORS} from './config.js';
 import {createFaceTexture} from './faceTexture.js';
 import {getTheme, themeColors} from './theme.js';
 
@@ -140,13 +140,20 @@ function uniqueVertexIndices(triangles) {
     return Array.from(new Set(triangles.flat()));
 }
 
-function computeFaceUVs(corners, normal) {
+function faceUpBasis(normal) {
     const n = new THREE.Vector3(...normal).normalize();
-    const u = new THREE.Vector3();
-    if (Math.abs(n.x) < 0.9) u.crossVectors(n, new THREE.Vector3(1, 0, 0));
-    else u.crossVectors(n, new THREE.Vector3(0, 1, 0));
-    u.normalize();
-    const v = new THREE.Vector3().crossVectors(n, u).normalize();
+    let v = new THREE.Vector3(0, 1, 0).projectOnPlane(n);
+    if (v.lengthSq() < 1e-6) {
+        v = new THREE.Vector3(CAMERA.position.x, CAMERA.position.y, CAMERA.position.z)
+            .negate().projectOnPlane(n);
+    }
+    v.normalize();
+    const u = new THREE.Vector3().crossVectors(v, n).normalize();
+    return {u, v, n};
+}
+
+function computeFaceUVs(corners, normal) {
+    const {u, v} = faceUpBasis(normal);
 
     const points = corners.map((corner) => {
         const p = new THREE.Vector3(...corner);
